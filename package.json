@@ -1,0 +1,16 @@
+{
+  "name": "pharma-sync-b2b-root",
+  "version": "1.0.0",
+  "private": true,
+  "description": "B2B Pharmaceutical, Surgical, and FMCG Ordering & Distribution Management Platform",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm --prefix apps/web-and-mobile run dev",
+    "build": "npm --prefix apps/web-and-mobile run build",
+    "start": "npm --prefix apps/web-and-mobile run start",
+    "lint": "npm --prefix apps/web-and-mobile run lint"
+  }
+}
