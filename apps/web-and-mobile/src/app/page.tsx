@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Header } from '@/components/Header';
+import { Header, ActiveTabType } from '@/components/Header';
 import { SearchHero } from '@/components/SearchHero';
 import { ProductCard } from '@/components/ProductCard';
 import { DistributorCompareDrawer } from '@/components/DistributorCompareDrawer';
@@ -9,13 +9,16 @@ import { ComplianceModal } from '@/components/ComplianceModal';
 import { CartDrawer } from '@/components/CartDrawer';
 import { AdminCatalogTab } from '@/components/AdminCatalogTab';
 import { DistributorUploadTab } from '@/components/DistributorUploadTab';
+import { DistributorOrderWorkstation } from '@/components/DistributorOrderWorkstation';
+import { LedgerAndRMATab } from '@/components/LedgerAndRMATab';
+import { GSTInvoiceModal } from '@/components/GSTInvoiceModal';
 import { OrderSuccessModal } from '@/components/OrderSuccessModal';
 import { MasterProduct, Organization, CartItem, DistributorBatchListing, ProductCategory, DrugSchedule } from '@/types';
 import { Pill, Sparkles, ShieldCheck, CheckCircle2 } from 'lucide-react';
 
 export default function Home() {
   // Navigation & Role states
-  const [activeTab, setActiveTab] = useState<'marketplace' | 'admin' | 'distributor'>('marketplace');
+  const [activeTab, setActiveTab] = useState<ActiveTabType>('marketplace');
   const [organizations, setOrganizations] = useState<Organization[]>([]);
   const [currentOrg, setCurrentOrg] = useState<Organization | null>(null);
   const [pincode, setPincode] = useState('500003');
@@ -33,6 +36,7 @@ export default function Home() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [complianceBlockedItem, setComplianceBlockedItem] = useState<{ name: string; schedule: string } | null>(null);
   const [confirmedOrder, setConfirmedOrder] = useState<{ number: string; total: number } | null>(null);
+  const [viewInvoiceId, setViewInvoiceId] = useState<string | null>(null);
 
   // 1. Fetch Organizations for Role Switcher
   useEffect(() => {
@@ -73,7 +77,7 @@ export default function Home() {
   useEffect(() => {
     const timer = setTimeout(() => {
       fetchProducts();
-    }, 150); // Instant 150ms debounce
+    }, 150);
     return () => clearTimeout(timer);
   }, [searchQuery, selectedCategory, selectedSchedule, pincode]);
 
@@ -124,7 +128,6 @@ export default function Home() {
       return;
     }
 
-    // Open comparison drawer so user picks or views the best distributor
     setCompareProduct(product);
   };
 
@@ -202,6 +205,22 @@ export default function Home() {
           </div>
         )}
 
+        {activeTab === 'orders' && (
+          <DistributorOrderWorkstation
+            currentOrg={currentOrg}
+            distributors={organizations}
+            onViewInvoice={(orderId) => setViewInvoiceId(orderId)}
+          />
+        )}
+
+        {activeTab === 'ledger' && (
+          <LedgerAndRMATab
+            currentOrg={currentOrg}
+            distributors={organizations}
+            onViewInvoice={(orderId) => setViewInvoiceId(orderId)}
+          />
+        )}
+
         {activeTab === 'admin' && <AdminCatalogTab />}
 
         {activeTab === 'distributor' && (
@@ -221,7 +240,7 @@ export default function Home() {
             <span>Telangana Pharmaceutical & Surgical Distribution Network</span>
           </div>
           <div className="flex items-center space-x-3 text-[11px]">
-            <span className="text-emerald-400 font-semibold">● Live Supabase DB Connected</span>
+            <span className="text-emerald-400 font-semibold font-mono">● Live Supabase DB Connected</span>
             <span>•</span>
             <span className="font-mono text-slate-400">PostgreSQL 16 FEFO Ready</span>
           </div>
@@ -250,7 +269,7 @@ export default function Home() {
         currentOrg={currentOrg}
         onOrderSuccess={(orderNum, grandTot) => {
           setConfirmedOrder({ number: orderNum, total: grandTot });
-          fetchProducts(); // Refresh stock counts in background!
+          fetchProducts();
         }}
       />
 
@@ -272,6 +291,13 @@ export default function Home() {
         orderNumber={confirmedOrder?.number || null}
         grandTotal={confirmedOrder?.total || 0}
         onClose={() => setConfirmedOrder(null)}
+      />
+
+      {/* GST Tax Invoice Printable Modal */}
+      <GSTInvoiceModal
+        invoiceIdOrOrderId={viewInvoiceId}
+        isOpen={Boolean(viewInvoiceId)}
+        onClose={() => setViewInvoiceId(null)}
       />
     </div>
   );
