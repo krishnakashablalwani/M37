@@ -1,15 +1,15 @@
 import { Pool } from 'pg';
 
-let pool: Pool;
+let pool: Pool | undefined;
+
+const connectionString =
+  process.env.DATABASE_URL ||
+  'postgresql://postgres.qvfvnmsruwwblyjrapiy:dK%24_5A8w_jf3Q7r@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres';
 
 export function getDbPool(): Pool {
   if (!pool) {
     pool = new Pool({
-      host: process.env.PGHOST || 'aws-0-ap-southeast-1.pooler.supabase.com',
-      port: Number(process.env.PGPORT) || 5432,
-      database: process.env.PGDATABASE || 'postgres',
-      user: process.env.PGUSER || 'postgres.qvfvnmsruwwblyjrapiy',
-      password: process.env.PGPASSWORD || 'dK$_5A8w_jf3Q7r',
+      connectionString,
       ssl: { rejectUnauthorized: false },
       max: 10,
       idleTimeoutMillis: 30000,
