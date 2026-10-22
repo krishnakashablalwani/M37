@@ -129,6 +129,19 @@ export function AutoReplenishDeck({ currentOrg, onPunchOrder }: AutoReplenishDec
     },
   ]);
 
+  // Fetch dynamic suggestions from backend for current retailer
+  React.useEffect(() => {
+    if (!currentOrg?.id) return;
+    fetch(`/api/replenishment/suggestions?retailer_id=${currentOrg.id}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && data.suggestions && data.suggestions.length > 0) {
+          setDraftItems(data.suggestions);
+        }
+      })
+      .catch(console.error);
+  }, [currentOrg]);
+
   const triggerTactile = (id: string) => {
     setActiveFlashId(id);
     setTimeout(() => setActiveFlashId(null), 300);

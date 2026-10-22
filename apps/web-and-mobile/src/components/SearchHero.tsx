@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useRef, useEffect } from 'react';
-import { Search, X, Filter } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Search, X, Filter, ScanLine } from 'lucide-react';
 import { ProductCategory, DrugSchedule } from '@/types';
+import { BarcodeScannerModal } from '@/components/BarcodeScannerModal';
 
 interface SearchHeroProps {
   searchQuery: string;
@@ -23,6 +24,7 @@ export function SearchHero({
   setSelectedSchedule,
   totalProducts,
 }: SearchHeroProps) {
+  const [scannerOpen, setScannerOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const categories: Array<{ id: ProductCategory | 'ALL'; label: string }> = [
@@ -79,22 +81,41 @@ export function SearchHero({
               placeholder="Search by Brand Name, Salt (e.g. Paracetamol 650), SKU code, or Manufacturer..."
               className="w-full py-3 pr-3 bg-transparent text-xs sm:text-sm text-slate-100 placeholder-slate-500 focus:outline-none font-sans"
             />
-            {searchQuery ? (
+            <div className="flex items-center space-x-1.5 pr-2.5">
+              {searchQuery ? (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="p-1 text-slate-400 hover:text-white cursor-pointer"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              ) : (
+                <div className="hidden sm:flex items-center space-x-1">
+                  <kbd className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-[#090D11] text-slate-400 border border-[#1E2631]">
+                    ⌘K
+                  </kbd>
+                </div>
+              )}
+
+              {/* Native Barcode Scanner Camera Trigger */}
               <button
-                onClick={() => setSearchQuery('')}
-                className="pr-3 text-slate-400 hover:text-white cursor-pointer"
+                type="button"
+                onClick={() => setScannerOpen(true)}
+                className="p-1.5 rounded-lg text-slate-400 hover:text-[#00D2C4] hover:bg-[#1E2631] transition-colors cursor-pointer"
+                title="Scan Medicine Box Barcode (EAN-13 / GS1)"
               >
-                <X className="w-4 h-4" />
+                <ScanLine className="w-4 h-4" />
               </button>
-            ) : (
-              <div className="pr-3 hidden sm:flex items-center space-x-1">
-                <kbd className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-[#090D11] text-slate-400 border border-[#1E2631]">
-                  ⌘K
-                </kbd>
-              </div>
-            )}
+            </div>
           </div>
         </div>
+
+        {/* Barcode Scanner Modal */}
+        <BarcodeScannerModal
+          isOpen={scannerOpen}
+          onClose={() => setScannerOpen(false)}
+          onBarcodeDetected={(code) => setSearchQuery(code)}
+        />
 
         {/* Category Pills */}
         <div className="mt-4 flex flex-wrap items-center justify-center gap-1.5 font-mono text-xs">
