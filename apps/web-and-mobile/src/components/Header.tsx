@@ -1,10 +1,10 @@
 'use client';
 
 import React from 'react';
-import { Pill, ShieldCheck, MapPin, ShoppingBag, Store, Building2, ShieldAlert, Truck, CreditCard, Layers, UploadCloud, Search } from 'lucide-react';
+import { Pill, ShieldCheck, MapPin, ShoppingBag, Building2, ShieldAlert, Truck, CreditCard, Layers, UploadCloud, Search, Sparkles, Check } from 'lucide-react';
 import { Organization, CartItem } from '@/types';
 
-export type ActiveTabType = 'marketplace' | 'admin' | 'distributor' | 'orders' | 'ledger';
+export type ActiveTabType = 'marketplace' | 'replenish' | 'orders' | 'ledger' | 'distributor' | 'admin';
 
 interface HeaderProps {
   currentOrg: Organization | null;
@@ -31,46 +31,93 @@ export function Header({
 }: HeaderProps) {
   const totalCartCount = cart.reduce((acc, it) => acc + it.quantity, 0);
 
+  // Live commercial credit limit for glanceable top bar
+  const totalCreditLimit = 50000;
+  const availableCredit = 38400;
+  const currentOutstanding = totalCreditLimit - availableCredit;
+  const creditUsagePct = Math.round((currentOutstanding / totalCreditLimit) * 100);
+
   const tabs: Array<{ id: ActiveTabType; label: string; icon: React.ReactNode }> = [
-    { id: 'marketplace', label: 'Marketplace', icon: <Search className="h-3.5 w-3.5" /> },
-    { id: 'orders', label: 'Order Workstation', icon: <Truck className="h-3.5 w-3.5" /> },
-    { id: 'ledger', label: 'Ledger & Claims', icon: <CreditCard className="h-3.5 w-3.5" /> },
-    { id: 'distributor', label: 'Stock Ingestion', icon: <UploadCloud className="h-3.5 w-3.5" /> },
-    { id: 'admin', label: 'Master Catalog', icon: <Layers className="h-3.5 w-3.5" /> },
+    { id: 'marketplace', label: 'Marketplace', icon: <Search className="w-3.5 h-3.5" /> },
+    { id: 'replenish', label: 'Auto-Replenish', icon: <Sparkles className="w-3.5 h-3.5 text-[#00D2C4]" /> },
+    { id: 'orders', label: 'Workstation', icon: <Truck className="w-3.5 h-3.5" /> },
+    { id: 'ledger', label: 'Credit Ledger', icon: <CreditCard className="w-3.5 h-3.5" /> },
+    { id: 'distributor', label: 'Stock Upload', icon: <UploadCloud className="w-3.5 h-3.5" /> },
+    { id: 'admin', label: 'Master SKU', icon: <Layers className="w-3.5 h-3.5" /> },
   ];
 
   return (
-    <header className="sticky top-0 z-40 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 text-slate-100 shadow-sm">
+    <header className="sticky top-0 z-40 bg-[#090D11]/95 backdrop-blur-md border-b border-[#1E2631] text-slate-100">
+      {/* Persistent Glanceable Counter Top Bar */}
+      <div className="bg-[#12181F] border-b border-[#1E2631] py-1.5 px-4 sm:px-6 lg:px-8 text-xs font-mono">
+        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+          {/* Shop Name & DL Verification Pill */}
+          <div className="flex items-center space-x-2">
+            <span className="text-slate-400 font-sans">Active Shop:</span>
+            <strong className="text-white font-sans">{currentOrg?.trade_name || 'Care Chemist'}</strong>
+            {currentOrg?.drug_license_no_20 ? (
+              <span className="inline-flex items-center gap-1 px-2 py-0.2 rounded-full text-[10px] bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-semibold font-sans">
+                <Check className="w-3 h-3 stroke-[3]" />
+                DL: {currentOrg.drug_license_no_20.slice(0, 14)}...
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1 px-2 py-0.2 rounded-full text-[10px] bg-amber-500/15 text-amber-400 border border-amber-500/30 font-semibold font-sans">
+                <ShieldAlert className="w-3 h-3" />
+                FMCG Only (No DL)
+              </span>
+            )}
+          </div>
+
+          {/* Credit Limit Micro-Gauge */}
+          <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-2 text-[11px]">
+              <span className="text-slate-400">Credit Limit:</span>
+              <span className="text-[#00D2C4] font-bold tabular-nums">
+                ₹{availableCredit.toLocaleString('en-IN')}
+              </span>
+              <span className="text-slate-500">/ ₹{totalCreditLimit.toLocaleString('en-IN')} Available</span>
+            </div>
+            {/* Visual Micro Bar */}
+            <div className="w-16 h-1.5 bg-[#090D11] rounded-full overflow-hidden border border-[#1E2631] hidden sm:block">
+              <div
+                className="h-full bg-[#00D2C4] rounded-full"
+                style={{ width: `${100 - creditUsagePct}%` }}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Header Navigation */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 gap-3">
+        <div className="flex items-center justify-between h-15 gap-3">
           {/* Brand Logo */}
-          <div className="flex items-center space-x-3 cursor-pointer shrink-0" onClick={() => setActiveTab('marketplace')}>
-            <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-cyan-600 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-600/20">
-              <Pill className="h-5 w-5 text-white" />
+          <div className="flex items-center space-x-2.5 cursor-pointer shrink-0" onClick={() => setActiveTab('marketplace')}>
+            <div className="h-9 w-9 rounded-lg bg-gradient-to-tr from-[#00D2C4] to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+              <Pill className="w-5 h-5 text-slate-950 font-black" />
             </div>
             <div>
-              <div className="flex items-center space-x-2">
-                <span className="font-extrabold text-lg tracking-tight text-white">
+              <div className="flex items-center space-x-1.5">
+                <span className="font-black text-base tracking-tight text-white">
                   PharmaSync
                 </span>
-                <span className="px-1.5 py-0.2 text-[10px] font-bold uppercase rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 font-mono">
+                <span className="px-1 py-0.2 text-[9px] font-bold uppercase rounded bg-[#00D2C4]/15 text-[#00D2C4] border border-[#00D2C4]/30 font-mono">
                   B2B
                 </span>
               </div>
-              <p className="text-[10px] text-slate-400 hidden sm:block">Zomato-grade Pharma & FMCG Distribution</p>
             </div>
           </div>
 
           {/* Navigation Tabs */}
-          <nav className="hidden lg:flex items-center space-x-1 bg-slate-950/80 p-1 rounded-xl border border-slate-800">
+          <nav className="hidden lg:flex items-center space-x-1 bg-[#12181F] p-1 rounded-xl border border-[#1E2631]">
             {tabs.map((t) => (
               <button
                 key={t.id}
                 onClick={() => setActiveTab(t.id)}
                 className={`flex items-center space-x-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${
                   activeTab === t.id
-                    ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-sm'
-                    : 'text-slate-400 hover:text-white hover:bg-slate-900'
+                    ? 'bg-[#00D2C4] text-slate-950 shadow-sm font-bold'
+                    : 'text-slate-400 hover:text-white hover:bg-[#1E2631]'
                 }`}
               >
                 {t.icon}
@@ -79,38 +126,22 @@ export function Header({
             ))}
           </nav>
 
-          {/* Persona Switcher & Cart */}
-          <div className="flex items-center space-x-3 shrink-0">
+          {/* Right Controls */}
+          <div className="flex items-center space-x-2.5 shrink-0">
             {/* Pincode Tag */}
-            <div className="hidden sm:flex items-center space-x-1.5 text-xs bg-slate-950 px-2.5 py-1.5 rounded-xl border border-slate-800 text-slate-300">
-              <MapPin className="h-3.5 w-3.5 text-cyan-400" />
-              <span>PIN:</span>
+            <div className="hidden sm:flex items-center space-x-1.5 text-xs bg-[#12181F] px-2.5 py-1 rounded-lg border border-[#1E2631] text-slate-300">
+              <MapPin className="w-3 h-3 text-[#00D2C4]" />
               <input
                 type="text"
                 value={pincode}
                 onChange={(e) => setPincode(e.target.value)}
-                className="w-16 bg-slate-900 border border-slate-700 rounded px-1.5 py-0.5 text-xs text-white text-center focus:outline-none focus:border-cyan-400 font-mono"
+                className="w-16 bg-transparent text-xs text-white text-center focus:outline-none font-mono"
               />
             </div>
 
             {/* Persona Selector Dropdown */}
             <div className="relative flex items-center">
-              <div className="flex items-center space-x-2 bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-slate-200 shadow-sm">
-                {currentOrg?.org_type === 'DISTRIBUTOR' ? (
-                  <Building2 className="h-4 w-4 text-emerald-400 shrink-0" />
-                ) : currentOrg?.drug_license_no_20 ? (
-                  <ShieldCheck className="h-4 w-4 text-cyan-400 shrink-0" />
-                ) : (
-                  <ShieldAlert className="h-4 w-4 text-amber-400 shrink-0" />
-                )}
-                <div className="text-left hidden xl:block">
-                  <div className="font-semibold text-white truncate max-w-[120px]">
-                    {currentOrg?.trade_name || 'Select Persona'}
-                  </div>
-                  <div className="text-[10px] text-slate-400">
-                    {currentOrg?.drug_license_no_20 ? 'DL Verified (Form 20/21)' : 'FMCG Only (No DL)'}
-                  </div>
-                </div>
+              <div className="flex items-center space-x-1.5 bg-[#12181F] border border-[#1E2631] rounded-lg px-2 py-1 text-xs text-slate-200">
                 <select
                   value={currentOrg?.id || ''}
                   onChange={(e) => {
@@ -120,9 +151,9 @@ export function Header({
                   className="bg-transparent text-xs text-slate-300 font-semibold cursor-pointer focus:outline-none"
                 >
                   {organizations.map((org) => (
-                    <option key={org.id} value={org.id} className="bg-slate-900 text-white">
-                      [{org.org_type === 'DISTRIBUTOR' ? 'DISTRIBUTOR' : 'RETAILER'}] {org.trade_name}{' '}
-                      {org.drug_license_no_20 ? '✓ (DL)' : '⚠️ (No DL)'}
+                    <option key={org.id} value={org.id} className="bg-[#12181F] text-white">
+                      [{org.org_type === 'DISTRIBUTOR' ? 'DIST' : 'RETAIL'}] {org.trade_name}{' '}
+                      {org.drug_license_no_20 ? '(DL Verified)' : '(No DL)'}
                     </option>
                   ))}
                 </select>
@@ -132,12 +163,12 @@ export function Header({
             {/* Cart Button */}
             <button
               onClick={onOpenCart}
-              className="relative flex items-center space-x-1.5 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white px-3 py-1.5 rounded-xl text-xs font-bold shadow-lg shadow-cyan-600/20 transition-all transform active:scale-95"
+              className="relative flex items-center space-x-1.5 bg-gradient-to-r from-cyan-500 to-[#00D2C4] hover:from-cyan-400 hover:to-teal-300 text-slate-950 px-3 py-1.5 rounded-lg text-xs font-bold shadow-lg shadow-cyan-500/20 transition-all active:scale-95"
             >
-              <ShoppingBag className="h-4 w-4" />
+              <ShoppingBag className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Cart</span>
               {totalCartCount > 0 && (
-                <span className="ml-1 bg-white text-blue-900 text-[10px] font-extrabold h-4.5 w-4.5 rounded-full flex items-center justify-center px-1 font-mono">
+                <span className="ml-1 bg-slate-950 text-[#00D2C4] text-[10px] font-black h-4 w-4 rounded-full flex items-center justify-center font-mono">
                   {totalCartCount}
                 </span>
               )}
@@ -146,13 +177,13 @@ export function Header({
         </div>
 
         {/* Mobile Navigation bar */}
-        <nav className="flex lg:hidden items-center justify-between py-2 border-t border-slate-800 text-xs overflow-x-auto gap-1">
+        <nav className="flex lg:hidden items-center justify-between py-2 border-t border-[#1E2631] text-xs overflow-x-auto gap-1">
           {tabs.map((t) => (
             <button
               key={t.id}
               onClick={() => setActiveTab(t.id)}
               className={`flex items-center space-x-1 px-2.5 py-1 rounded-lg shrink-0 font-medium ${
-                activeTab === t.id ? 'bg-cyan-500/20 text-cyan-400 font-bold' : 'text-slate-400 hover:text-white'
+                activeTab === t.id ? 'bg-[#00D2C4] text-slate-950 font-bold' : 'text-slate-400 hover:text-white'
               }`}
             >
               {t.icon}

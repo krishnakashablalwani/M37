@@ -3,8 +3,10 @@
 import React, { useState, useEffect } from 'react';
 import { Header, ActiveTabType } from '@/components/Header';
 import { SearchHero } from '@/components/SearchHero';
-import { ProductCard } from '@/components/ProductCard';
+import { ProductSearchCard } from '@/components/ProductSearchCard';
 import { DistributorCompareDrawer } from '@/components/DistributorCompareDrawer';
+import { AutoReplenishDeck } from '@/components/AutoReplenishDeck';
+import { StickyReplenishmentFooter } from '@/components/StickyReplenishmentFooter';
 import { ComplianceModal } from '@/components/ComplianceModal';
 import { CartDrawer } from '@/components/CartDrawer';
 import { AdminCatalogTab } from '@/components/AdminCatalogTab';
@@ -14,7 +16,7 @@ import { LedgerAndRMATab } from '@/components/LedgerAndRMATab';
 import { GSTInvoiceModal } from '@/components/GSTInvoiceModal';
 import { OrderSuccessModal } from '@/components/OrderSuccessModal';
 import { MasterProduct, Organization, CartItem, DistributorBatchListing, ProductCategory, DrugSchedule } from '@/types';
-import { Pill, Sparkles, ShieldCheck, CheckCircle2 } from 'lucide-react';
+import { Pill, AlertCircle } from 'lucide-react';
 
 export default function Home() {
   // Navigation & Role states
@@ -144,8 +146,8 @@ export default function Home() {
   const handleClearCart = () => setCart([]);
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-cyan-500 selection:text-white">
-      {/* Global Header */}
+    <div className="min-h-screen bg-[#090D11] text-slate-100 flex flex-col font-sans selection:bg-[#00D2C4] selection:text-slate-950 pb-20">
+      {/* Persistent Glanceable Header */}
       <Header
         currentOrg={currentOrg}
         organizations={organizations}
@@ -158,11 +160,11 @@ export default function Home() {
         setPincode={setPincode}
       />
 
-      {/* Main Tab Content */}
+      {/* Main Content Area */}
       <main className="flex-1">
+        {/* TAB 1: MARKETPLACE */}
         {activeTab === 'marketplace' && (
           <div>
-            {/* Search Hero */}
             <SearchHero
               searchQuery={searchQuery}
               setSearchQuery={setSearchQuery}
@@ -173,28 +175,27 @@ export default function Home() {
               totalProducts={products.length}
             />
 
-            {/* Product Grid */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
               {loading ? (
                 <div className="flex flex-col items-center justify-center py-20 space-y-3">
-                  <div className="h-10 w-10 border-3 border-cyan-400 border-t-transparent rounded-full animate-spin" />
-                  <p className="text-xs text-slate-400">Searching master catalog across active stockists...</p>
+                  <div className="w-8 h-8 border-2 border-[#00D2C4] border-t-transparent rounded-full animate-spin" />
+                  <p className="text-xs text-slate-400 font-mono">Querying canonical Master SKUs...</p>
                 </div>
               ) : products.length === 0 ? (
-                <div className="text-center py-20 bg-slate-900/40 rounded-3xl border border-slate-800">
-                  <Pill className="h-12 w-12 text-slate-600 mx-auto mb-3" />
-                  <h3 className="text-lg font-bold text-white">No products found</h3>
-                  <p className="text-xs text-slate-400 max-w-md mx-auto mt-1">
-                    Try searching for another brand name, generic salt (e.g. Paracetamol), or clear filters.
+                <div className="text-center py-20 bg-[#12181F] rounded-2xl border border-[#1E2631]">
+                  <Pill className="w-10 h-10 text-slate-600 mx-auto mb-2" />
+                  <h3 className="text-base font-bold text-white">No products found</h3>
+                  <p className="text-xs text-slate-400 mt-1 font-mono">
+                    Try searching for &quot;Paracetamol&quot; or clearing active schedule filters.
                   </p>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {products.map((p) => (
-                    <ProductCard
+                    <ProductSearchCard
                       key={p.id}
                       product={p}
-                      onOpenCompare={(prod) => setCompareProduct(prod)}
+                      onOpenDistributors={(prod) => setCompareProduct(prod)}
                       onQuickAdd={handleQuickAdd}
                       currentOrg={currentOrg}
                     />
@@ -205,6 +206,15 @@ export default function Home() {
           </div>
         )}
 
+        {/* TAB 2: AUTO-REPLENISHMENT (THE TRIAGE & APPROVE DECK) */}
+        {activeTab === 'replenish' && (
+          <AutoReplenishDeck
+            currentOrg={currentOrg}
+            onPunchOrder={() => fetchProducts()}
+          />
+        )}
+
+        {/* TAB 3: WORKSTATION */}
         {activeTab === 'orders' && (
           <DistributorOrderWorkstation
             currentOrg={currentOrg}
@@ -213,6 +223,7 @@ export default function Home() {
           />
         )}
 
+        {/* TAB 4: CREDIT LEDGER & CLAIMS */}
         {activeTab === 'ledger' && (
           <LedgerAndRMATab
             currentOrg={currentOrg}
@@ -221,33 +232,42 @@ export default function Home() {
           />
         )}
 
-        {activeTab === 'admin' && <AdminCatalogTab />}
-
+        {/* TAB 5: STOCK UPLOAD */}
         {activeTab === 'distributor' && (
           <DistributorUploadTab
             currentOrg={currentOrg}
             distributors={organizations}
           />
         )}
+
+        {/* TAB 6: MASTER SKU */}
+        {activeTab === 'admin' && <AdminCatalogTab />}
       </main>
 
       {/* Footer */}
-      <footer className="bg-slate-950 border-t border-slate-800/80 py-6 text-center text-xs text-slate-500">
+      <footer className="bg-[#090D11] border-t border-[#1E2631] py-4 text-center text-xs text-slate-500 font-mono">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
           <div className="flex items-center space-x-2">
             <span className="font-bold text-slate-300">PharmaSync B2B</span>
             <span>•</span>
-            <span>Telangana Pharmaceutical & Surgical Distribution Network</span>
+            <span>Telangana Pharmaceutical & Surgical Supply Chain</span>
           </div>
           <div className="flex items-center space-x-3 text-[11px]">
-            <span className="text-emerald-400 font-semibold font-mono">● Live Supabase DB Connected</span>
+            <span className="text-[#00D2C4] font-semibold">● Live Supabase DB</span>
             <span>•</span>
-            <span className="font-mono text-slate-400">PostgreSQL 16 FEFO Ready</span>
+            <span>FEFO Stored Procedure Active</span>
           </div>
         </div>
       </footer>
 
-      {/* Zomato-Style Distributor Comparison Drawer */}
+      {/* Mobile Sticky Replenishment Footer */}
+      <StickyReplenishmentFooter
+        cart={cart}
+        onOpenCart={() => setCartOpen(true)}
+        onOpenReplenish={() => setActiveTab('replenish')}
+      />
+
+      {/* Zomato-Style Distributor Peek Sheet Bottom Drawer */}
       <DistributorCompareDrawer
         product={compareProduct}
         isOpen={Boolean(compareProduct)}

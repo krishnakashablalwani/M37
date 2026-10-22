@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { X, Building2, Phone, Star, ShieldCheck, Clock, Check, Sparkles, AlertCircle, ShoppingBag } from 'lucide-react';
+import { X, Building2, Phone, ShieldCheck, Clock, Sparkles, AlertCircle, ShoppingBag, Lock, Check } from 'lucide-react';
 import { MasterProduct, DistributorBatchListing, Organization } from '@/types';
 
 interface DistributorCompareDrawerProps {
@@ -13,6 +13,8 @@ interface DistributorCompareDrawerProps {
   onAddToCart: (product: MasterProduct, batch: DistributorBatchListing, quantity: number) => void;
   onComplianceBlocked: (productName: string, schedule: string) => void;
 }
+
+type SortOption = 'price' | 'scheme' | 'delivery' | 'preferred';
 
 export function DistributorCompareDrawer({
   product,
@@ -27,6 +29,8 @@ export function DistributorCompareDrawer({
   const [loading, setLoading] = useState(false);
   const [revealedPhoneId, setRevealedPhoneId] = useState<string | null>(null);
   const [quantities, setQuantities] = useState<Record<string, number>>({});
+  const [activeFlashId, setActiveFlashId] = useState<string | null>(null);
+  const [sortBy, setSortBy] = useState<SortOption>('price');
 
   useEffect(() => {
     if (!product || !isOpen) return;
@@ -37,7 +41,6 @@ export function DistributorCompareDrawer({
       .then((data) => {
         if (data.success) {
           setDistributors(data.distributors || []);
-          // Initialize default quantities to MOQ
           const qMap: Record<string, number> = {};
           (data.distributors || []).forEach((d: DistributorBatchListing) => {
             qMap[d.batch_id] = d.moq || 1;
@@ -54,108 +57,192 @@ export function DistributorCompareDrawer({
   const isRestrictedSchedule = ['SCHEDULE_H', 'SCHEDULE_H1', 'SCHEDULE_X'].includes(product.schedule);
   const lacksDl = isRestrictedSchedule && (!currentOrg?.drug_license_no_20 || currentOrg.kyc_state !== 'APPROVED');
 
+  const triggerTactileFlash = (batchId: string) => {
+    setActiveFlashId(batchId);
+    setTimeout(() => setActiveFlashId(null), 400);
+  };
+
+  const handleQtyChange = (d: DistributorBatchListing, delta: number) => {
+    const moq = d.moq || 1;
+    const cur = quantities[d.batch_id] || moq;
+    // Step by MOQ or by 1
+    const step = moq > 1 ? moq : 1;
+    const nextVal = Math.max(moq, Math.min(d.available_qty, cur + delta * step));
+    setQuantities((prev) => ({ ...prev, [d.batch_id]: nextVal }));
+    triggerTactileFlash(d.batch_id);
+  };
+
   const handleAdd = (d: DistributorBatchListing) => {
     if (lacksDl) {
       onComplianceBlocked(product.brand_name, product.schedule);
       return;
     }
     const qty = quantities[d.batch_id] || d.moq || 1;
+    triggerTactileFlash(d.batch_id);
     onAddToCart(product, d, qty);
   };
 
+  // Sort distributors based on criteria
+  const sortedDistributors = [...distributors].sort((a, b) => {
+    if (sortBy === 'scheme') {
+      const aScheme = a.scheme_description ? 1 : 0;
+      const bScheme = b.scheme_description ? 1 : 0;
+      return bScheme - aScheme;
+    }
+    if (sortBy === 'delivery') {
+      return (b.reliability_score || 0) - (a.reliability_score || 0);
+    }
+    if (sortBy === 'preferred') {
+      const aPref = a.is_preferred ? 1 : 0;
+      const bPref = b.is_preferred ? 1 : 0;
+      return bPref - aPref;
+    }
+    return (a.net_landing_price || a.ptr) - (b.net_landing_price || b.ptr);
+  });
+
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden bg-black/70 backdrop-blur-sm flex justify-end transition-opacity duration-300">
-      <div className="w-full max-w-2xl bg-slate-900 border-l border-slate-800 h-full flex flex-col shadow-2xl text-white animate-in slide-in-from-right duration-300">
+    <div className="fixed inset-0 z-50 overflow-hidden bg-black/80 backdrop-blur-sm flex justify-end transition-opacity duration-300">
+      <div className="w-full max-w-xl bg-[#090D11] border-l border-[#1E2631] h-full flex flex-col shadow-2xl text-slate-100 animate-in slide-in-from-right duration-300">
         {/* Header */}
-        <div className="p-5 border-b border-slate-800 bg-slate-950/60 flex items-start justify-between">
+        <div className="p-5 border-b border-[#1E2631] bg-[#12181F] flex items-start justify-between">
           <div>
             <div className="flex items-center space-x-2">
-              <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-cyan-500/10 text-cyan-400 border border-cyan-500/30">
-                {product.category}
+              <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                {product.pack_size}
               </span>
-              <span className="text-xs text-slate-400 font-mono">SKU: {product.sku_code}</span>
+              <span className="text-[10px] bg-[#1E2631] text-slate-300 px-1.5 py-0.2 rounded font-mono">
+                HSN: {product.hsn_code}
+              </span>
+              <span className="text-[10px] text-[#00D2C4] font-mono font-bold">
+                {product.gst_percentage}% GST
+              </span>
             </div>
-            <h2 className="text-lg sm:text-xl font-extrabold text-white mt-1 leading-snug">
+            <h2 className="text-lg font-bold text-white mt-1 leading-snug">
               {product.brand_name}
             </h2>
             {product.generic_composition && (
               <p className="text-xs text-slate-400 font-mono mt-0.5">{product.generic_composition}</p>
             )}
-            <div className="mt-1 flex items-center space-x-2 text-xs text-slate-400">
-              <span>{product.manufacturer}</span>
-              <span>•</span>
-              <span>{product.pack_size}</span>
-              <span>•</span>
-              <span className="text-cyan-400 font-medium">HSN: {product.hsn_code} ({product.gst_percentage}% GST)</span>
-            </div>
+            <p className="text-[11px] text-slate-500 mt-1 font-sans">{product.manufacturer}</p>
           </div>
 
           <button
             onClick={onClose}
-            className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-[#1E2631] transition-colors cursor-pointer"
           >
-            <X className="h-5 w-5" />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Serving Pincode Banner */}
-        <div className="bg-slate-800/60 px-5 py-2.5 text-xs text-slate-300 flex items-center justify-between border-b border-slate-800">
-          <span>Comparing stockists serving Pincode: <strong className="text-cyan-400 font-mono">{pincode}</strong></span>
-          <span className="text-[11px] text-slate-400">{distributors.length} eligible distributor{distributors.length === 1 ? '' : 's'}</span>
+        {/* Ranking Sort Pills */}
+        <div className="bg-[#12181F]/60 px-5 py-2.5 border-b border-[#1E2631] flex flex-wrap items-center justify-between gap-2 text-xs">
+          <span className="text-slate-400 font-mono text-[11px]">Compare Stockists:</span>
+          <div className="flex items-center space-x-1 flex-wrap gap-1">
+            <button
+              onClick={() => setSortBy('price')}
+              className={`px-2.5 py-1 rounded text-[11px] font-semibold transition-all cursor-pointer ${
+                sortBy === 'price'
+                  ? 'bg-[#00D2C4] text-slate-950 font-bold shadow-sm'
+                  : 'text-slate-400 hover:text-white hover:bg-[#1E2631]'
+              }`}
+            >
+              Best Price
+            </button>
+            <button
+              onClick={() => setSortBy('scheme')}
+              className={`px-2.5 py-1 rounded text-[11px] font-semibold transition-all cursor-pointer ${
+                sortBy === 'scheme'
+                  ? 'bg-purple-500 text-white font-bold shadow-sm'
+                  : 'text-slate-400 hover:text-white hover:bg-[#1E2631]'
+              }`}
+            >
+              Best Scheme
+            </button>
+            <button
+              onClick={() => setSortBy('delivery')}
+              className={`px-2.5 py-1 rounded text-[11px] font-semibold transition-all cursor-pointer ${
+                sortBy === 'delivery'
+                  ? 'bg-blue-500 text-white font-bold shadow-sm'
+                  : 'text-slate-400 hover:text-white hover:bg-[#1E2631]'
+              }`}
+            >
+              Fastest Delivery
+            </button>
+            <button
+              onClick={() => setSortBy('preferred')}
+              className={`px-2.5 py-1 rounded text-[11px] font-semibold transition-all cursor-pointer ${
+                sortBy === 'preferred'
+                  ? 'bg-emerald-500 text-slate-950 font-bold shadow-sm'
+                  : 'text-slate-400 hover:text-white hover:bg-[#1E2631]'
+              }`}
+            >
+              Preferred Stockist
+            </button>
+          </div>
         </div>
 
-        {/* Content: List of Stockists */}
+        {/* Drug License Missing Warning Header */}
+        {lacksDl && (
+          <div className="bg-amber-500/10 border-b border-amber-500/20 px-5 py-2.5 flex items-center space-x-2 text-xs text-amber-300">
+            <Lock className="w-4 h-4 text-amber-400 shrink-0" />
+            <span>
+              <strong>Schedule H/H1 Restriction:</strong> Verified Drug License (Form 20/21) required to unlock wholesale orders.
+            </span>
+          </div>
+        )}
+
+        {/* Stockist Batch Cards List */}
         <div className="flex-1 overflow-y-auto p-5 space-y-4">
           {loading ? (
-            <div className="flex flex-col items-center justify-center h-48 space-y-3">
-              <div className="h-8 w-8 border-3 border-cyan-400 border-t-transparent rounded-full animate-spin" />
-              <p className="text-xs text-slate-400">Querying real-time stockist rates and batch inventory...</p>
+            <div className="flex flex-col items-center justify-center h-48 space-y-2">
+              <div className="w-7 h-7 border-2 border-[#00D2C4] border-t-transparent rounded-full animate-spin" />
+              <p className="text-xs text-slate-400 font-mono">Querying real-time stockist inventory...</p>
             </div>
-          ) : distributors.length === 0 ? (
-            <div className="text-center py-12 text-slate-400">
-              <AlertCircle className="h-10 w-10 text-amber-400 mx-auto mb-2" />
-              <p className="text-sm font-semibold text-white">No active stockists found</p>
-              <p className="text-xs text-slate-500 mt-1">
-                No distributor currently has available stock for this product in pincode {pincode}.
-              </p>
+          ) : sortedDistributors.length === 0 ? (
+            <div className="text-center py-12 text-slate-400 bg-[#12181F] rounded-xl border border-[#1E2631] p-6">
+              <AlertCircle className="w-8 h-8 text-amber-400 mx-auto mb-2" />
+              <p className="text-sm font-bold text-white">No active stockists found</p>
+              <p className="text-xs text-slate-500 mt-1 font-mono">Pincode: {pincode}</p>
             </div>
           ) : (
-            distributors.map((d, idx) => {
-              const isBestPrice = idx === 0;
+            sortedDistributors.map((d, idx) => {
+              const isBest = idx === 0;
               const curQty = quantities[d.batch_id] || d.moq || 1;
+              const isFlashing = activeFlashId === d.batch_id;
 
               return (
                 <div
                   key={d.batch_id}
-                  className={`relative rounded-2xl border p-4 transition-all duration-200 ${
-                    isBestPrice
-                      ? 'bg-gradient-to-br from-slate-900 to-cyan-950/30 border-cyan-500/50 shadow-lg shadow-cyan-500/10'
-                      : 'bg-slate-900/90 border-slate-800 hover:border-slate-700'
+                  className={`relative rounded-xl border p-4 transition-all duration-200 ${
+                    isFlashing
+                      ? 'ring-2 ring-[#00D2C4] border-[#00D2C4]'
+                      : isBest
+                      ? 'bg-[#12181F] border-[#00D2C4]/60 shadow-lg shadow-cyan-950/20'
+                      : 'bg-[#12181F] border-[#1E2631] hover:border-slate-700'
                   }`}
                 >
-                  {isBestPrice && (
-                    <div className="absolute -top-2.5 right-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full shadow-sm">
-                      ⚡ Lowest Net Landing Price
+                  {isBest && (
+                    <div className="absolute -top-2.5 right-4 bg-[#00D2C4] text-slate-950 text-[10px] font-black uppercase px-2 py-0.5 rounded shadow-sm font-mono tracking-wider">
+                      TOP MATCH
                     </div>
                   )}
 
-                  {/* Distributor Info & Score */}
+                  {/* Stockist Name & Verification */}
                   <div className="flex items-start justify-between">
                     <div>
-                      <div className="flex items-center space-x-2">
-                        <Building2 className="h-4 w-4 text-cyan-400" />
+                      <div className="flex items-center space-x-1.5">
+                        <Building2 className="w-4 h-4 text-[#00D2C4]" />
                         <h4 className="font-bold text-white text-sm">{d.distributor_name}</h4>
                         {d.is_preferred && (
-                          <span className="text-[10px] bg-blue-500/20 text-blue-300 border border-blue-500/30 px-1.5 py-0.2 rounded font-semibold">
+                          <span className="text-[10px] bg-blue-500/15 text-blue-400 border border-blue-500/20 px-1.5 py-0.2 rounded font-mono font-bold">
                             Preferred
                           </span>
                         )}
                       </div>
-                      <div className="text-[11px] text-slate-400 flex items-center space-x-2 mt-0.5">
+                      <div className="text-[11px] text-slate-400 flex items-center space-x-2 mt-0.5 font-mono">
                         <span>{d.city}</span>
                         <span>•</span>
-                        <span className="flex items-center text-amber-400 font-medium">
-                          <Star className="h-3 w-3 mr-0.5 fill-current" />
+                        <span className="text-emerald-400 font-medium">
                           {d.reliability_score}% Fulfillment Rate
                         </span>
                       </div>
@@ -163,110 +250,113 @@ export function DistributorCompareDrawer({
 
                     {/* Net Landing Price */}
                     <div className="text-right">
-                      <div className="text-[10px] text-slate-400 uppercase font-semibold">Net Landing Price</div>
-                      <div className="text-lg font-extrabold text-white font-mono">
+                      <span className="text-[10px] uppercase font-mono text-slate-500 block">
+                        Net Landing (Incl. GST)
+                      </span>
+                      <div className="text-base font-extrabold text-white font-mono tabular-nums">
                         ₹{d.net_landing_price}
-                        <span className="text-[10px] text-slate-400 font-normal"> / unit</span>
+                        <span className="text-[10px] text-slate-500 font-normal"> / unit</span>
                       </div>
-                      <div className="text-[10px] text-slate-500">
-                        Base PTR: ₹{d.ptr} | MRP: ₹{d.mrp}
+                      <div className="text-[10px] text-slate-500 font-mono">
+                        PTR: ₹{d.ptr}
                       </div>
                     </div>
                   </div>
 
-                  {/* Batch Details & Expiry */}
-                  <div className="mt-3 grid grid-cols-2 sm:grid-cols-3 gap-2 bg-slate-950/60 rounded-xl p-2.5 text-xs text-slate-300 border border-slate-800">
+                  {/* Batch Details, Expiry & FEFO Status */}
+                  <div className="mt-3 grid grid-cols-3 gap-2 bg-[#090D11] rounded-lg p-2.5 text-xs text-slate-300 border border-[#1E2631] font-mono">
                     <div>
-                      <span className="text-[10px] text-slate-500 block uppercase font-medium">Batch No</span>
-                      <strong className="font-mono text-white">{d.batch_number}</strong>
+                      <span className="text-[9px] text-slate-500 block uppercase">Batch #</span>
+                      <strong className="text-white text-[11px]">{d.batch_number}</strong>
                     </div>
                     <div>
-                      <span className="text-[10px] text-slate-500 block uppercase font-medium">Earliest Expiry</span>
-                      <strong className="text-emerald-400 font-mono">{d.expiry_date}</strong>
+                      <span className="text-[9px] text-slate-500 block uppercase">Expiry</span>
+                      <strong className="text-emerald-400 text-[11px]">Exp: {d.expiry_date}</strong>
                     </div>
                     <div>
-                      <span className="text-[10px] text-slate-500 block uppercase font-medium">Stock Available</span>
-                      <strong className="text-white font-mono">{d.available_qty} units</strong>
+                      <span className="text-[9px] text-slate-500 block uppercase">Available Stock</span>
+                      <strong className="text-white text-[11px]">{d.available_qty} units</strong>
                     </div>
                   </div>
 
-                  {/* Active Scheme (if any) */}
+                  {/* Scheme Callout */}
                   {d.scheme_description && (
-                    <div className="mt-2.5 flex items-center space-x-1.5 text-xs bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-lg px-2.5 py-1.5">
-                      <Sparkles className="h-3.5 w-3.5 shrink-0" />
-                      <span>Distributor Scheme: <strong>{d.scheme_description}</strong></span>
+                    <div className="mt-2.5 flex items-center space-x-1.5 text-xs bg-purple-500/10 border border-purple-500/20 text-purple-300 rounded-lg px-2.5 py-1.5 font-semibold">
+                      <Sparkles className="w-3.5 h-3.5 text-purple-400 shrink-0" />
+                      <span className="font-mono">{d.scheme_description}</span>
                     </div>
                   )}
 
                   {/* Delivery SLA & MOQ */}
-                  <div className="mt-2.5 flex items-center justify-between text-xs text-slate-400">
+                  <div className="mt-2.5 flex items-center justify-between text-xs text-slate-400 font-mono text-[11px]">
                     <span className="flex items-center space-x-1 text-slate-300">
-                      <Clock className="h-3 w-3 text-cyan-400" />
-                      <span>Delivery: <strong>{d.delivery_sla}</strong></span>
+                      <Clock className="w-3 h-3 text-[#00D2C4]" />
+                      <span>{d.delivery_sla}</span>
                     </span>
-                    <span className="text-slate-400">
-                      MOQ: <strong className="text-white font-mono">{d.moq}</strong> units
-                    </span>
+                    <span>MOQ: <strong className="text-white">{d.moq} units</strong></span>
                   </div>
 
-                  {/* Actions: Call Distributor & Add to Cart */}
-                  <div className="mt-3 pt-3 border-t border-slate-800/80 flex items-center justify-between gap-3">
-                    {/* Call Distributor */}
+                  {/* Action Bar */}
+                  <div className="mt-3 pt-3 border-t border-[#1E2631] flex items-center justify-between gap-3">
+                    {/* Phone Reveal */}
                     <div>
                       {revealedPhoneId === d.batch_id ? (
                         <a
                           href={`tel:${d.distributor_phone}`}
-                          className="inline-flex items-center space-x-1 text-xs text-cyan-400 font-bold bg-cyan-500/10 border border-cyan-500/30 px-2.5 py-1.5 rounded-lg hover:underline"
+                          className="inline-flex items-center space-x-1 text-xs text-[#00D2C4] font-bold bg-[#00D2C4]/10 border border-[#00D2C4]/30 px-2.5 py-1.5 rounded-lg font-mono hover:bg-[#00D2C4]/20"
                         >
-                          <Phone className="h-3 w-3" />
+                          <Phone className="w-3 h-3" />
                           <span>{d.distributor_phone}</span>
                         </a>
                       ) : (
                         <button
                           onClick={() => setRevealedPhoneId(d.batch_id)}
-                          className="inline-flex items-center space-x-1 text-xs text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 px-2.5 py-1.5 rounded-lg border border-slate-700 transition-colors"
+                          className="inline-flex items-center space-x-1 text-xs text-slate-400 hover:text-white bg-[#090D11] hover:bg-[#1E2631] px-2.5 py-1.5 rounded-lg border border-[#1E2631] transition-colors cursor-pointer"
                         >
-                          <Phone className="h-3 w-3" />
+                          <Phone className="w-3 h-3" />
                           <span>Call Stockist</span>
                         </button>
                       )}
                     </div>
 
-                    {/* Quantity Selector & Add Button */}
+                    {/* Quantity Stepper & Add Stock Action */}
                     <div className="flex items-center space-x-2">
-                      <div className="flex items-center bg-slate-800 rounded-lg border border-slate-700 overflow-hidden text-xs">
+                      <div className="flex items-center bg-[#090D11] rounded-lg border border-[#1E2631] overflow-hidden text-xs">
                         <button
-                          onClick={() => {
-                            const newQ = Math.max(d.moq || 1, curQty - 1);
-                            setQuantities({ ...quantities, [d.batch_id]: newQ });
-                          }}
-                          className="px-2 py-1 text-slate-400 hover:text-white hover:bg-slate-700"
+                          onClick={() => handleQtyChange(d, -1)}
+                          className="px-2.5 py-1 text-slate-400 hover:text-white hover:bg-[#1E2631] font-mono font-bold cursor-pointer"
+                          title="Decrease quantity"
                         >
                           -
                         </button>
-                        <span className="px-2 font-mono font-bold text-white">{curQty}</span>
+                        <span className="px-2 font-mono font-bold text-white tabular-nums">{curQty}</span>
                         <button
-                          onClick={() => {
-                            const newQ = Math.min(d.available_qty, curQty + 1);
-                            setQuantities({ ...quantities, [d.batch_id]: newQ });
-                          }}
-                          className="px-2 py-1 text-slate-400 hover:text-white hover:bg-slate-700"
+                          onClick={() => handleQtyChange(d, 1)}
+                          className="px-2.5 py-1 text-slate-400 hover:text-white hover:bg-[#1E2631] font-mono font-bold cursor-pointer"
+                          title="Snap to next pack multiple"
                         >
                           +
                         </button>
                       </div>
 
-                      <button
-                        onClick={() => handleAdd(d)}
-                        className={`flex items-center space-x-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shadow-md ${
-                          lacksDl
-                            ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30'
-                            : 'bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white shadow-cyan-500/20'
-                        }`}
-                      >
-                        <ShoppingBag className="h-3.5 w-3.5" />
-                        <span>Add from this Stockist</span>
-                      </button>
+                      {lacksDl ? (
+                        <button
+                          onClick={() => onComplianceBlocked(product.brand_name, product.schedule)}
+                          className="inline-flex items-center space-x-1 px-3 py-1.5 rounded-lg text-xs font-bold bg-amber-500/10 text-amber-400 border border-amber-500/30 hover:bg-amber-500/20 cursor-pointer"
+                          title="Drug License Form 20/21 Required"
+                        >
+                          <Lock className="w-3.5 h-3.5" />
+                          <span>DL Req</span>
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => handleAdd(d)}
+                          className="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-lg text-xs font-black bg-gradient-to-r from-cyan-500 to-[#00D2C4] hover:from-cyan-400 hover:to-teal-300 text-slate-950 transition-all active:scale-95 shadow-md shadow-cyan-950/20 cursor-pointer"
+                        >
+                          <ShoppingBag className="w-3.5 h-3.5" />
+                          <span>Add Stock</span>
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>

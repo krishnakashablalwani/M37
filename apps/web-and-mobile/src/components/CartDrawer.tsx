@@ -88,14 +88,14 @@ export function CartDrawer({
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden bg-black/70 backdrop-blur-sm flex justify-end animate-in fade-in duration-200">
-      <div className="w-full max-w-xl bg-slate-900 border-l border-slate-800 h-full flex flex-col shadow-2xl text-white">
+    <div className="fixed inset-0 z-50 overflow-hidden bg-black/80 backdrop-blur-sm flex justify-end animate-in fade-in duration-200">
+      <div className="w-full max-w-xl bg-[#090D11] border-l border-[#1E2631] h-full flex flex-col shadow-2xl text-slate-100">
         {/* Header */}
-        <div className="p-5 border-b border-slate-800 flex items-center justify-between bg-slate-950/70">
+        <div className="p-5 border-b border-[#1E2631] flex items-center justify-between bg-[#12181F]">
           <div className="flex items-center space-x-2">
-            <ShoppingBag className="h-5 w-5 text-cyan-400" />
+            <ShoppingBag className="h-5 w-5 text-[#00D2C4]" />
             <h2 className="text-lg font-bold text-white">Your Cart</h2>
-            <span className="text-xs bg-slate-800 px-2 py-0.5 rounded-full font-mono text-cyan-400">
+            <span className="text-xs bg-[#1E2631] px-2 py-0.5 rounded-full font-mono text-[#00D2C4]">
               {cart.length} item{cart.length === 1 ? '' : 's'}
             </span>
           </div>
@@ -256,21 +256,22 @@ export function CartDrawer({
 
         {/* Overall Cart Footer */}
         {cart.length > 0 && (
-          <div className="p-5 border-t border-slate-800 bg-slate-950/90 text-xs space-y-2">
+          <div className="p-5 border-t border-[#1E2631] bg-[#12181F] text-xs space-y-2 font-mono">
             <div className="flex justify-between text-slate-400">
               <span>Items Total (Wholesale PTR):</span>
-              <span className="font-mono text-white">₹{overallSubtotal.toFixed(2)}</span>
+              <span className="text-white tabular-nums">₹{overallSubtotal.toFixed(2)}</span>
             </div>
             <div className="flex justify-between text-slate-400">
               <span>Total GST (CGST + SGST):</span>
-              <span className="font-mono text-white">₹{overallTax.toFixed(2)}</span>
+              <span className="text-white tabular-nums">₹{overallTax.toFixed(2)}</span>
             </div>
-            <div className="pt-2 border-t border-slate-800 flex justify-between text-sm font-extrabold text-white">
+            <div className="pt-2 border-t border-[#1E2631] flex justify-between text-sm font-extrabold text-white">
               <span>Grand Total:</span>
-              <span className="font-mono text-cyan-400 text-base">₹{overallGrandTotal.toFixed(2)}</span>
+              <span className="text-[#00D2C4] text-base tabular-nums">₹{overallGrandTotal.toFixed(2)}</span>
             </div>
-            <p className="text-[10px] text-slate-500 pt-1">
-              🔒 Invoices are legally generated on behalf of the respective fulfilling distributor. Concurrency protection enforced via atomic PostgreSQL row locking.
+            <p className="text-[10px] text-slate-500 pt-1 flex items-center gap-1 font-sans">
+              <ShieldCheck className="w-3.5 h-3.5 text-[#00D2C4] shrink-0" />
+              <span>Invoices are legally generated per fulfilling distributor with atomic PostgreSQL row locking.</span>
             </p>
           </div>
         )}

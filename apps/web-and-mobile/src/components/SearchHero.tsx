@@ -1,7 +1,7 @@
 'use client';
 
-import React from 'react';
-import { Search, Sparkles, X, Filter } from 'lucide-react';
+import React, { useRef, useEffect } from 'react';
+import { Search, X, Filter } from 'lucide-react';
 import { ProductCategory, DrugSchedule } from '@/types';
 
 interface SearchHeroProps {
@@ -23,92 +23,110 @@ export function SearchHero({
   setSelectedSchedule,
   totalProducts,
 }: SearchHeroProps) {
-  const categories: Array<{ id: ProductCategory | 'ALL'; label: string; icon: string }> = [
-    { id: 'ALL', label: 'All Categories', icon: '✨' },
-    { id: 'PHARMA', label: 'Pharmaceuticals (Rx)', icon: '💊' },
-    { id: 'SURGICAL', label: 'Surgical & Medical', icon: '🩺' },
-    { id: 'FMCG', label: 'FMCG & OTC', icon: '🧴' },
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const categories: Array<{ id: ProductCategory | 'ALL'; label: string }> = [
+    { id: 'ALL', label: 'All Categories' },
+    { id: 'PHARMA', label: 'Pharmaceuticals (Rx)' },
+    { id: 'SURGICAL', label: 'Surgical & Medical' },
+    { id: 'FMCG', label: 'FMCG & OTC' },
   ];
 
   const schedules: Array<{ id: DrugSchedule | 'ALL'; label: string; color: string }> = [
-    { id: 'ALL', label: 'All Schedules', color: 'bg-slate-800 text-slate-300' },
-    { id: 'OTC', label: 'OTC / Non-Pharma', color: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' },
+    { id: 'ALL', label: 'All Schedules', color: 'bg-[#12181F] text-slate-400 border-[#1E2631]' },
+    { id: 'OTC', label: 'OTC (Free Sale)', color: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' },
     { id: 'SCHEDULE_H', label: 'Schedule H (Rx)', color: 'bg-amber-500/10 text-amber-400 border-amber-500/30' },
-    { id: 'SCHEDULE_H1', label: 'Schedule H1 (High Risk)', color: 'bg-rose-500/10 text-rose-400 border-rose-500/30' },
+    { id: 'SCHEDULE_H1', label: 'Schedule H1 (Restricted)', color: 'bg-rose-500/10 text-rose-400 border-rose-500/30' },
   ];
 
-  return (
-    <div className="relative bg-gradient-to-b from-slate-900 via-slate-900/90 to-slate-950 pt-8 pb-6 px-4 sm:px-6 lg:px-8 border-b border-slate-800">
-      <div className="max-w-4xl mx-auto text-center">
-        {/* Tagline */}
-        <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-medium mb-3">
-          <Sparkles className="h-3.5 w-3.5" />
-          <span>Multi-Distributor Real-time Stock & Price Comparison</span>
-        </div>
+  // Keyboard shortcut listener (Cmd+K or /)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        inputRef.current?.focus();
+      } else if (e.key === '/' && document.activeElement !== inputRef.current) {
+        e.preventDefault();
+        inputRef.current?.focus();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
-        <h1 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight">
-          Search Master Catalog & Distributor Stock
+  return (
+    <div className="bg-[#090D11] pt-6 pb-6 px-4 sm:px-6 lg:px-8 border-b border-[#1E2631]">
+      <div className="max-w-4xl mx-auto text-center">
+        {/* Title */}
+        <h1 className="text-xl sm:text-3xl font-black text-slate-100 tracking-tight">
+          B2B Pharmaceutical & Wholesale Stock Search
         </h1>
-        <p className="mt-1 text-sm text-slate-400 max-w-2xl mx-auto">
-          Compare wholesale PTR, live batches, delivery SLAs, and commercial promotional schemes across stockists in Secunderabad & Hyderabad.
+        <p className="mt-1 text-xs text-slate-400 max-w-xl mx-auto font-sans">
+          Instant debounced discovery across canonical Master SKUs, generic salts, manufacturer batches, and active Telangana stockists.
         </p>
 
-        {/* Instant Debounced Search Bar */}
-        <div className="mt-6 relative max-w-3xl mx-auto">
-          <div className="relative flex items-center shadow-2xl rounded-2xl overflow-hidden border-2 border-slate-700/80 focus-within:border-cyan-400 bg-slate-800/90 transition-all">
-            <div className="pl-4 pr-2 text-slate-400">
-              <Search className="h-5 w-5 text-cyan-400" />
+        {/* Command Search Bar */}
+        <div className="mt-5 relative max-w-2xl mx-auto">
+          <div className="relative flex items-center rounded-xl border border-[#1E2631] bg-[#12181F] focus-within:border-[#00D2C4] shadow-xl transition-all">
+            <div className="pl-3.5 pr-2 text-slate-400">
+              <Search className="w-4 h-4 text-[#00D2C4]" />
             </div>
             <input
+              ref={inputRef}
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search by Brand Name, Salt (e.g. Paracetamol 650), SKU, or Manufacturer..."
-              className="w-full py-3.5 pr-10 bg-transparent text-sm sm:text-base text-white placeholder-slate-400 focus:outline-none"
+              placeholder="Search by Brand Name, Salt (e.g. Paracetamol 650), SKU code, or Manufacturer..."
+              className="w-full py-3 pr-3 bg-transparent text-xs sm:text-sm text-slate-100 placeholder-slate-500 focus:outline-none font-sans"
             />
-            {searchQuery && (
+            {searchQuery ? (
               <button
                 onClick={() => setSearchQuery('')}
-                className="pr-4 text-slate-400 hover:text-white"
+                className="pr-3 text-slate-400 hover:text-white cursor-pointer"
               >
-                <X className="h-4 w-4" />
+                <X className="w-4 h-4" />
               </button>
+            ) : (
+              <div className="pr-3 hidden sm:flex items-center space-x-1">
+                <kbd className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-[#090D11] text-slate-400 border border-[#1E2631]">
+                  ⌘K
+                </kbd>
+              </div>
             )}
           </div>
         </div>
 
         {/* Category Pills */}
-        <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
+        <div className="mt-4 flex flex-wrap items-center justify-center gap-1.5 font-mono text-xs">
           {categories.map((c) => (
             <button
               key={c.id}
               onClick={() => setSelectedCategory(c.id)}
-              className={`flex items-center space-x-1.5 px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                 selectedCategory === c.id
-                  ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/20 scale-105'
-                  : 'bg-slate-800/80 hover:bg-slate-800 text-slate-300 border border-slate-700'
+                  ? 'bg-[#00D2C4] text-slate-950 font-bold shadow-sm'
+                  : 'bg-[#12181F] hover:bg-[#1E2631] text-slate-400 border border-[#1E2631]'
               }`}
             >
-              <span>{c.icon}</span>
-              <span>{c.label}</span>
+              {c.label}
             </button>
           ))}
         </div>
 
-        {/* Drug Schedule Filter Pills */}
-        <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
-          <span className="text-[11px] text-slate-500 uppercase tracking-wider font-semibold mr-1 flex items-center">
-            <Filter className="h-3 w-3 mr-1" /> Schedule:
+        {/* Drug Schedule Filter */}
+        <div className="mt-2.5 flex flex-wrap items-center justify-center gap-1.5">
+          <span className="text-[10px] text-slate-500 uppercase tracking-wider font-mono font-semibold mr-1 flex items-center">
+            <Filter className="w-3 h-3 mr-1" /> Legal Schedule:
           </span>
           {schedules.map((s) => (
             <button
               key={s.id}
               onClick={() => setSelectedSchedule(s.id)}
-              className={`px-2.5 py-1 rounded-lg text-[11px] font-medium border transition-all ${
+              className={`px-2.5 py-0.5 rounded text-[10px] font-mono font-medium border transition-all cursor-pointer ${
                 s.color
               } ${
                 selectedSchedule === s.id
-                  ? 'ring-2 ring-cyan-400 font-bold shadow-sm'
+                  ? 'ring-1 ring-[#00D2C4] font-bold shadow-sm'
                   : 'opacity-70 hover:opacity-100'
               }`}
             >
@@ -117,11 +135,11 @@ export function SearchHero({
           ))}
         </div>
 
-        {/* Results Counter Summary */}
-        <div className="mt-4 flex items-center justify-center text-xs text-slate-400 space-x-2">
-          <span>Found <strong className="text-white font-mono">{totalProducts}</strong> matching master products</span>
+        {/* Count */}
+        <div className="mt-3 text-[11px] font-mono text-slate-500">
+          Found <span className="text-white font-bold">{totalProducts}</span> master SKU records
           {searchQuery && (
-            <span>for &quot;<span className="text-cyan-400">{searchQuery}</span>&quot;</span>
+            <span> matching &quot;<span className="text-[#00D2C4]">{searchQuery}</span>&quot;</span>
           )}
         </div>
       </div>

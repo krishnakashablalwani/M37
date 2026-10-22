@@ -24,3 +24,6 @@ export async function query<T = any>(text: string, params?: any[]): Promise<T[]>
   const res = await p.query(text, params);
   return res.rows as T[];
 }
+
+export default getDbPool;
+
