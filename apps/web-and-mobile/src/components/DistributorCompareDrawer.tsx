@@ -65,7 +65,6 @@ export function DistributorCompareDrawer({
   const handleQtyChange = (d: DistributorBatchListing, delta: number) => {
     const moq = d.moq || 1;
     const cur = quantities[d.batch_id] || moq;
-    // Step by MOQ or by 1
     const step = moq > 1 ? moq : 1;
     const nextVal = Math.max(moq, Math.min(d.available_qty, cur + delta * step));
     setQuantities((prev) => ({ ...prev, [d.batch_id]: nextVal }));
@@ -101,49 +100,49 @@ export function DistributorCompareDrawer({
   });
 
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden bg-black/80 backdrop-blur-sm flex justify-end transition-opacity duration-300">
-      <div className="w-full max-w-xl bg-[#090D11] border-l border-[#1E2631] h-full flex flex-col shadow-2xl text-slate-100 animate-in slide-in-from-right duration-300">
+    <div className="fixed inset-0 z-50 overflow-hidden bg-slate-900/60 backdrop-blur-xs flex justify-end transition-opacity duration-200">
+      <div className="w-full max-w-xl bg-white dark:bg-[#101726] border-l border-slate-200 dark:border-slate-800 h-full flex flex-col shadow-2xl text-slate-900 dark:text-slate-100 animate-in slide-in-from-right duration-200">
         {/* Header */}
-        <div className="p-5 border-b border-[#1E2631] bg-[#12181F] flex items-start justify-between">
+        <div className="p-5 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#131926] flex items-start justify-between">
           <div>
             <div className="flex items-center space-x-2">
-              <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-slate-400">
+              <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 bg-slate-200/80 dark:bg-slate-800 px-1.5 py-0.5 rounded border border-slate-300 dark:border-slate-700">
                 {product.pack_size}
               </span>
-              <span className="text-[10px] bg-[#1E2631] text-slate-300 px-1.5 py-0.2 rounded font-mono">
-                HSN: {product.hsn_code}
+              <span className="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 px-1.5 py-0.5 rounded font-mono border border-slate-200 dark:border-slate-700">
+                HSN {product.hsn_code}
               </span>
-              <span className="text-[10px] text-[#00D2C4] font-mono font-bold">
-                {product.gst_percentage}% GST
+              <span className="text-[10px] text-teal-700 dark:text-teal-400 font-mono font-bold">
+                +{product.gst_percentage}% GST
               </span>
             </div>
-            <h2 className="text-lg font-bold text-white mt-1 leading-snug">
+            <h2 className="text-lg font-black text-slate-900 dark:text-white mt-1.5 leading-snug tracking-tight">
               {product.brand_name}
             </h2>
             {product.generic_composition && (
-              <p className="text-xs text-slate-400 font-mono mt-0.5">{product.generic_composition}</p>
+              <p className="text-xs text-slate-600 dark:text-slate-300 font-mono mt-0.5 font-medium">{product.generic_composition}</p>
             )}
-            <p className="text-[11px] text-slate-500 mt-1 font-sans">{product.manufacturer}</p>
+            <p className="text-[11px] text-slate-500 font-sans mt-1">{product.manufacturer}</p>
           </div>
 
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-[#1E2631] transition-colors cursor-pointer"
+            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Ranking Sort Pills */}
-        <div className="bg-[#12181F]/60 px-5 py-2.5 border-b border-[#1E2631] flex flex-wrap items-center justify-between gap-2 text-xs">
-          <span className="text-slate-400 font-mono text-[11px]">Compare Stockists:</span>
-          <div className="flex items-center space-x-1 flex-wrap gap-1">
+        <div className="bg-slate-50/60 dark:bg-[#0F141F] px-5 py-2.5 border-b border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2 text-xs">
+          <span className="text-slate-500 dark:text-slate-400 font-mono text-[11px] font-semibold">Rank by:</span>
+          <div className="flex items-center space-x-1 flex-wrap gap-1 font-mono">
             <button
               onClick={() => setSortBy('price')}
               className={`px-2.5 py-1 rounded text-[11px] font-semibold transition-all cursor-pointer ${
                 sortBy === 'price'
-                  ? 'bg-[#00D2C4] text-slate-950 font-bold shadow-sm'
-                  : 'text-slate-400 hover:text-white hover:bg-[#1E2631]'
+                  ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-bold shadow-xs border border-slate-300 dark:border-slate-700'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               Best Price
@@ -152,8 +151,8 @@ export function DistributorCompareDrawer({
               onClick={() => setSortBy('scheme')}
               className={`px-2.5 py-1 rounded text-[11px] font-semibold transition-all cursor-pointer ${
                 sortBy === 'scheme'
-                  ? 'bg-purple-500 text-white font-bold shadow-sm'
-                  : 'text-slate-400 hover:text-white hover:bg-[#1E2631]'
+                  ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-bold shadow-xs border border-slate-300 dark:border-slate-700'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               Best Scheme
@@ -162,8 +161,8 @@ export function DistributorCompareDrawer({
               onClick={() => setSortBy('delivery')}
               className={`px-2.5 py-1 rounded text-[11px] font-semibold transition-all cursor-pointer ${
                 sortBy === 'delivery'
-                  ? 'bg-blue-500 text-white font-bold shadow-sm'
-                  : 'text-slate-400 hover:text-white hover:bg-[#1E2631]'
+                  ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-bold shadow-xs border border-slate-300 dark:border-slate-700'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               Fastest Delivery
@@ -172,8 +171,8 @@ export function DistributorCompareDrawer({
               onClick={() => setSortBy('preferred')}
               className={`px-2.5 py-1 rounded text-[11px] font-semibold transition-all cursor-pointer ${
                 sortBy === 'preferred'
-                  ? 'bg-emerald-500 text-slate-950 font-bold shadow-sm'
-                  : 'text-slate-400 hover:text-white hover:bg-[#1E2631]'
+                  ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-bold shadow-xs border border-slate-300 dark:border-slate-700'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               Preferred Stockist
@@ -183,8 +182,8 @@ export function DistributorCompareDrawer({
 
         {/* Drug License Missing Warning Header */}
         {lacksDl && (
-          <div className="bg-amber-500/10 border-b border-amber-500/20 px-5 py-2.5 flex items-center space-x-2 text-xs text-amber-300">
-            <Lock className="w-4 h-4 text-amber-400 shrink-0" />
+          <div className="bg-amber-50 dark:bg-amber-950/40 border-b border-amber-200 dark:border-amber-800/80 px-5 py-2.5 flex items-center space-x-2 text-xs text-amber-800 dark:text-amber-300 font-medium">
+            <Lock className="w-4 h-4 text-amber-600 shrink-0" />
             <span>
               <strong>Schedule H/H1 Restriction:</strong> Verified Drug License (Form 20/21) required to unlock wholesale orders.
             </span>
@@ -195,13 +194,13 @@ export function DistributorCompareDrawer({
         <div className="flex-1 overflow-y-auto p-5 space-y-4">
           {loading ? (
             <div className="flex flex-col items-center justify-center h-48 space-y-2">
-              <div className="w-7 h-7 border-2 border-[#00D2C4] border-t-transparent rounded-full animate-spin" />
-              <p className="text-xs text-slate-400 font-mono">Querying real-time stockist inventory...</p>
+              <div className="w-7 h-7 border-2 border-teal-600 border-t-transparent rounded-full animate-spin" />
+              <p className="text-xs text-slate-500 font-mono">Querying real-time stockist inventory...</p>
             </div>
           ) : sortedDistributors.length === 0 ? (
-            <div className="text-center py-12 text-slate-400 bg-[#12181F] rounded-xl border border-[#1E2631] p-6">
-              <AlertCircle className="w-8 h-8 text-amber-400 mx-auto mb-2" />
-              <p className="text-sm font-bold text-white">No active stockists found</p>
+            <div className="text-center py-12 text-slate-400 bg-slate-50 dark:bg-[#131926] rounded-xl border border-slate-200 dark:border-slate-800 p-6">
+              <AlertCircle className="w-8 h-8 text-amber-500 mx-auto mb-2" />
+              <p className="text-sm font-bold text-slate-800 dark:text-white">No active stockists found</p>
               <p className="text-xs text-slate-500 mt-1 font-mono">Pincode: {pincode}</p>
             </div>
           ) : (
@@ -213,16 +212,16 @@ export function DistributorCompareDrawer({
               return (
                 <div
                   key={d.batch_id}
-                  className={`relative rounded-xl border p-4 transition-all duration-200 ${
+                  className={`relative rounded-xl border p-4.5 transition-all duration-150 ${
                     isFlashing
-                      ? 'ring-2 ring-[#00D2C4] border-[#00D2C4]'
+                      ? 'ring-2 ring-teal-500 border-teal-500 bg-teal-50/20'
                       : isBest
-                      ? 'bg-[#12181F] border-[#00D2C4]/60 shadow-lg shadow-cyan-950/20'
-                      : 'bg-[#12181F] border-[#1E2631] hover:border-slate-700'
+                      ? 'bg-white dark:bg-[#131926] border-teal-500/60 shadow-xs'
+                      : 'bg-white dark:bg-[#131926] border-slate-200 dark:border-slate-800 hover:border-slate-300'
                   }`}
                 >
                   {isBest && (
-                    <div className="absolute -top-2.5 right-4 bg-[#00D2C4] text-slate-950 text-[10px] font-black uppercase px-2 py-0.5 rounded shadow-sm font-mono tracking-wider">
+                    <div className="absolute -top-2.5 right-4 bg-teal-600 text-white text-[10px] font-black uppercase px-2 py-0.5 rounded shadow-xs font-mono tracking-wider">
                       TOP MATCH
                     </div>
                   )}
@@ -231,18 +230,18 @@ export function DistributorCompareDrawer({
                   <div className="flex items-start justify-between">
                     <div>
                       <div className="flex items-center space-x-1.5">
-                        <Building2 className="w-4 h-4 text-[#00D2C4]" />
-                        <h4 className="font-bold text-white text-sm">{d.distributor_name}</h4>
+                        <Building2 className="w-4 h-4 text-teal-600 dark:text-teal-400" />
+                        <h4 className="font-bold text-slate-900 dark:text-white text-sm">{d.distributor_name}</h4>
                         {d.is_preferred && (
-                          <span className="text-[10px] bg-blue-500/15 text-blue-400 border border-blue-500/20 px-1.5 py-0.2 rounded font-mono font-bold">
+                          <span className="text-[10px] bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-800 px-1.5 py-0.2 rounded font-mono font-bold">
                             Preferred
                           </span>
                         )}
                       </div>
-                      <div className="text-[11px] text-slate-400 flex items-center space-x-2 mt-0.5 font-mono">
+                      <div className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center space-x-2 mt-0.5 font-mono">
                         <span>{d.city}</span>
                         <span>•</span>
-                        <span className="text-emerald-400 font-medium">
+                        <span className="text-emerald-700 dark:text-emerald-400 font-medium">
                           {d.reliability_score}% Fulfillment Rate
                         </span>
                       </div>
@@ -250,60 +249,60 @@ export function DistributorCompareDrawer({
 
                     {/* Net Landing Price */}
                     <div className="text-right">
-                      <span className="text-[10px] uppercase font-mono text-slate-500 block">
+                      <span className="text-[10px] uppercase font-mono text-slate-500 block font-semibold">
                         Net Landing (Incl. GST)
                       </span>
-                      <div className="text-base font-extrabold text-white font-mono tabular-nums">
+                      <div className="text-base font-black text-slate-900 dark:text-white font-mono tabular-nums">
                         ₹{d.net_landing_price}
-                        <span className="text-[10px] text-slate-500 font-normal"> / unit</span>
+                        <span className="text-[10px] text-slate-400 font-normal"> / unit</span>
                       </div>
-                      <div className="text-[10px] text-slate-500 font-mono">
+                      <div className="text-[10px] text-slate-400 font-mono">
                         PTR: ₹{d.ptr}
                       </div>
                     </div>
                   </div>
 
                   {/* Batch Details, Expiry & FEFO Status */}
-                  <div className="mt-3 grid grid-cols-3 gap-2 bg-[#090D11] rounded-lg p-2.5 text-xs text-slate-300 border border-[#1E2631] font-mono">
+                  <div className="mt-3.5 grid grid-cols-3 gap-2 bg-slate-50 dark:bg-slate-900/80 rounded-lg p-2.5 text-xs text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 font-mono">
                     <div>
-                      <span className="text-[9px] text-slate-500 block uppercase">Batch #</span>
-                      <strong className="text-white text-[11px]">{d.batch_number}</strong>
+                      <span className="text-[9px] text-slate-500 block uppercase font-bold">Batch #</span>
+                      <strong className="text-slate-900 dark:text-white text-[11px]">{d.batch_number}</strong>
                     </div>
                     <div>
-                      <span className="text-[9px] text-slate-500 block uppercase">Expiry</span>
-                      <strong className="text-emerald-400 text-[11px]">Exp: {d.expiry_date}</strong>
+                      <span className="text-[9px] text-slate-500 block uppercase font-bold">Expiry</span>
+                      <strong className="text-emerald-700 dark:text-emerald-400 text-[11px]">Exp: {d.expiry_date}</strong>
                     </div>
                     <div>
-                      <span className="text-[9px] text-slate-500 block uppercase">Available Stock</span>
-                      <strong className="text-white text-[11px]">{d.available_qty} units</strong>
+                      <span className="text-[9px] text-slate-500 block uppercase font-bold">Available Stock</span>
+                      <strong className="text-slate-900 dark:text-white text-[11px]">{d.available_qty} units</strong>
                     </div>
                   </div>
 
                   {/* Scheme Callout */}
                   {d.scheme_description && (
-                    <div className="mt-2.5 flex items-center space-x-1.5 text-xs bg-purple-500/10 border border-purple-500/20 text-purple-300 rounded-lg px-2.5 py-1.5 font-semibold">
-                      <Sparkles className="w-3.5 h-3.5 text-purple-400 shrink-0" />
+                    <div className="mt-2.5 flex items-center space-x-1.5 text-xs bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800 text-indigo-800 dark:text-indigo-300 rounded-lg px-2.5 py-1.5 font-semibold">
+                      <Sparkles className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
                       <span className="font-mono">{d.scheme_description}</span>
                     </div>
                   )}
 
                   {/* Delivery SLA & MOQ */}
-                  <div className="mt-2.5 flex items-center justify-between text-xs text-slate-400 font-mono text-[11px]">
-                    <span className="flex items-center space-x-1 text-slate-300">
-                      <Clock className="w-3 h-3 text-[#00D2C4]" />
+                  <div className="mt-2.5 flex items-center justify-between text-xs text-slate-500 font-mono text-[11px]">
+                    <span className="flex items-center space-x-1 text-slate-600 dark:text-slate-400">
+                      <Clock className="w-3 h-3 text-teal-600 dark:text-teal-400" />
                       <span>{d.delivery_sla}</span>
                     </span>
-                    <span>MOQ: <strong className="text-white">{d.moq} units</strong></span>
+                    <span>MOQ: <strong className="text-slate-900 dark:text-white">{d.moq} units</strong></span>
                   </div>
 
                   {/* Action Bar */}
-                  <div className="mt-3 pt-3 border-t border-[#1E2631] flex items-center justify-between gap-3">
+                  <div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3">
                     {/* Phone Reveal */}
                     <div>
                       {revealedPhoneId === d.batch_id ? (
                         <a
                           href={`tel:${d.distributor_phone}`}
-                          className="inline-flex items-center space-x-1 text-xs text-[#00D2C4] font-bold bg-[#00D2C4]/10 border border-[#00D2C4]/30 px-2.5 py-1.5 rounded-lg font-mono hover:bg-[#00D2C4]/20"
+                          className="inline-flex items-center space-x-1 text-xs text-teal-800 dark:text-teal-300 font-bold bg-teal-50 dark:bg-teal-950/50 border border-teal-200 dark:border-teal-800 px-2.5 py-1.5 rounded-lg font-mono"
                         >
                           <Phone className="w-3 h-3" />
                           <span>{d.distributor_phone}</span>
@@ -311,7 +310,7 @@ export function DistributorCompareDrawer({
                       ) : (
                         <button
                           onClick={() => setRevealedPhoneId(d.batch_id)}
-                          className="inline-flex items-center space-x-1 text-xs text-slate-400 hover:text-white bg-[#090D11] hover:bg-[#1E2631] px-2.5 py-1.5 rounded-lg border border-[#1E2631] transition-colors cursor-pointer"
+                          className="inline-flex items-center space-x-1 text-xs text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 transition-colors cursor-pointer"
                         >
                           <Phone className="w-3 h-3" />
                           <span>Call Stockist</span>
@@ -321,18 +320,18 @@ export function DistributorCompareDrawer({
 
                     {/* Quantity Stepper & Add Stock Action */}
                     <div className="flex items-center space-x-2">
-                      <div className="flex items-center bg-[#090D11] rounded-lg border border-[#1E2631] overflow-hidden text-xs">
+                      <div className="flex items-center bg-slate-100 dark:bg-slate-900 rounded-lg border border-slate-300 dark:border-slate-700 overflow-hidden text-xs">
                         <button
                           onClick={() => handleQtyChange(d, -1)}
-                          className="px-2.5 py-1 text-slate-400 hover:text-white hover:bg-[#1E2631] font-mono font-bold cursor-pointer"
+                          className="px-2.5 py-1 text-slate-500 hover:text-slate-900 dark:hover:text-white font-mono font-bold cursor-pointer"
                           title="Decrease quantity"
                         >
                           -
                         </button>
-                        <span className="px-2 font-mono font-bold text-white tabular-nums">{curQty}</span>
+                        <span className="px-2 font-mono font-bold text-slate-900 dark:text-white tabular-nums">{curQty}</span>
                         <button
                           onClick={() => handleQtyChange(d, 1)}
-                          className="px-2.5 py-1 text-slate-400 hover:text-white hover:bg-[#1E2631] font-mono font-bold cursor-pointer"
+                          className="px-2.5 py-1 text-slate-500 hover:text-slate-900 dark:hover:text-white font-mono font-bold cursor-pointer"
                           title="Snap to next pack multiple"
                         >
                           +
@@ -342,7 +341,7 @@ export function DistributorCompareDrawer({
                       {lacksDl ? (
                         <button
                           onClick={() => onComplianceBlocked(product.brand_name, product.schedule)}
-                          className="inline-flex items-center space-x-1 px-3 py-1.5 rounded-lg text-xs font-bold bg-amber-500/10 text-amber-400 border border-amber-500/30 hover:bg-amber-500/20 cursor-pointer"
+                          className="inline-flex items-center space-x-1 px-3 py-1.5 rounded-lg text-xs font-bold bg-amber-50 text-amber-800 border border-amber-300 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-700 hover:bg-amber-100 cursor-pointer font-mono"
                           title="Drug License Form 20/21 Required"
                         >
                           <Lock className="w-3.5 h-3.5" />
@@ -351,7 +350,7 @@ export function DistributorCompareDrawer({
                       ) : (
                         <button
                           onClick={() => handleAdd(d)}
-                          className="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-lg text-xs font-black bg-gradient-to-r from-cyan-500 to-[#00D2C4] hover:from-cyan-400 hover:to-teal-300 text-slate-950 transition-all active:scale-95 shadow-md shadow-cyan-950/20 cursor-pointer"
+                          className="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold bg-teal-600 hover:bg-teal-700 text-white transition-all active:scale-95 shadow-xs cursor-pointer"
                         >
                           <ShoppingBag className="w-3.5 h-3.5" />
                           <span>Add Stock</span>

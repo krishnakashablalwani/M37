@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Header, ActiveTabType } from '@/components/Header';
 import { SearchHero } from '@/components/SearchHero';
 import { ProductSearchCard } from '@/components/ProductSearchCard';
+import { ProductOrderSheet } from '@/components/ProductOrderSheet';
 import { DistributorCompareDrawer } from '@/components/DistributorCompareDrawer';
 import { AutoReplenishDeck } from '@/components/AutoReplenishDeck';
 import { StickyReplenishmentFooter } from '@/components/StickyReplenishmentFooter';
@@ -29,6 +30,7 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<ProductCategory | 'ALL'>('ALL');
   const [selectedSchedule, setSelectedSchedule] = useState<DrugSchedule | 'ALL'>('ALL');
+  const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
   const [products, setProducts] = useState<MasterProduct[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -39,6 +41,27 @@ export default function Home() {
   const [complianceBlockedItem, setComplianceBlockedItem] = useState<{ name: string; schedule: string } | null>(null);
   const [confirmedOrder, setConfirmedOrder] = useState<{ number: string; total: number } | null>(null);
   const [viewInvoiceId, setViewInvoiceId] = useState<string | null>(null);
+
+  // Theme State (Default to Light Mode)
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+
+  useEffect(() => {
+    const saved = localStorage.getItem('pharmasync-theme') as 'light' | 'dark' | null;
+    if (saved) {
+      setTheme(saved);
+      if (saved === 'dark') document.documentElement.classList.add('dark');
+      else document.documentElement.classList.remove('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, []);
+
+  const handleToggleTheme = (newTheme: 'light' | 'dark') => {
+    setTheme(newTheme);
+    localStorage.setItem('pharmasync-theme', newTheme);
+    if (newTheme === 'dark') document.documentElement.classList.add('dark');
+    else document.documentElement.classList.remove('dark');
+  };
 
   // 1. Fetch Organizations for Role Switcher
   useEffect(() => {
@@ -120,7 +143,7 @@ export default function Home() {
     setCartOpen(true);
   };
 
-  const handleQuickAdd = async (product: MasterProduct) => {
+  const handleQuickAdd = async (product: MasterProduct, quantity: number = 10) => {
     // Check Drug License restriction
     const isRestricted = ['SCHEDULE_H', 'SCHEDULE_H1', 'SCHEDULE_X'].includes(product.schedule);
     const lacksDl = isRestricted && (!currentOrg?.drug_license_no_20 || currentOrg.kyc_state !== 'APPROVED');
@@ -146,7 +169,7 @@ export default function Home() {
   const handleClearCart = () => setCart([]);
 
   return (
-    <div className="min-h-screen bg-[#090D11] text-slate-100 flex flex-col font-sans selection:bg-[#00D2C4] selection:text-slate-950 pb-20">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#0B0F17] text-slate-900 dark:text-slate-100 flex flex-col font-sans selection:bg-teal-500 selection:text-white pb-20 transition-colors">
       {/* Persistent Glanceable Header */}
       <Header
         currentOrg={currentOrg}
@@ -158,6 +181,8 @@ export default function Home() {
         onOpenCart={() => setCartOpen(true)}
         pincode={pincode}
         setPincode={setPincode}
+        theme={theme}
+        setTheme={handleToggleTheme}
       />
 
       {/* Main Content Area */}
@@ -173,24 +198,33 @@ export default function Home() {
               selectedSchedule={selectedSchedule}
               setSelectedSchedule={setSelectedSchedule}
               totalProducts={products.length}
+              viewMode={viewMode}
+              setViewMode={setViewMode}
             />
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
               {loading ? (
                 <div className="flex flex-col items-center justify-center py-20 space-y-3">
-                  <div className="w-8 h-8 border-2 border-[#00D2C4] border-t-transparent rounded-full animate-spin" />
-                  <p className="text-xs text-slate-400 font-mono">Querying canonical Master SKUs...</p>
+                  <div className="w-8 h-8 border-2 border-teal-600 border-t-transparent rounded-full animate-spin" />
+                  <p className="text-xs text-slate-500 font-mono">Querying live Master SKUs...</p>
                 </div>
               ) : products.length === 0 ? (
-                <div className="text-center py-20 bg-[#12181F] rounded-2xl border border-[#1E2631]">
-                  <Pill className="w-10 h-10 text-slate-600 mx-auto mb-2" />
-                  <h3 className="text-base font-bold text-white">No products found</h3>
-                  <p className="text-xs text-slate-400 mt-1 font-mono">
-                    Try searching for &quot;Paracetamol&quot; or clearing active schedule filters.
+                <div className="text-center py-20 bg-white dark:bg-[#131926] rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs">
+                  <Pill className="w-10 h-10 text-slate-400 dark:text-slate-600 mx-auto mb-2" />
+                  <h3 className="text-base font-bold text-slate-900 dark:text-white">No products found</h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-mono">
+                    Try clearing active search query or schedule filter.
                   </p>
                 </div>
+              ) : viewMode === 'table' ? (
+                <ProductOrderSheet
+                  products={products}
+                  onOpenDistributors={(prod) => setCompareProduct(prod)}
+                  onQuickAdd={handleQuickAdd}
+                  currentOrg={currentOrg}
+                />
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                   {products.map((p) => (
                     <ProductSearchCard
                       key={p.id}
@@ -205,6 +239,7 @@ export default function Home() {
             </div>
           </div>
         )}
+
 
         {/* TAB 2: AUTO-REPLENISHMENT (THE TRIAGE & APPROVE DECK) */}
         {activeTab === 'replenish' && (
@@ -245,20 +280,21 @@ export default function Home() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-[#090D11] border-t border-[#1E2631] py-4 text-center text-xs text-slate-500 font-mono">
+      <footer className="bg-white dark:bg-[#101726] border-t border-slate-200 dark:border-slate-800 py-4 text-center text-xs text-slate-500 dark:text-slate-400 font-mono transition-colors">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
           <div className="flex items-center space-x-2">
-            <span className="font-bold text-slate-300">PharmaSync B2B</span>
+            <span className="font-bold text-slate-900 dark:text-slate-200">PharmaSync B2B</span>
             <span>•</span>
             <span>Telangana Pharmaceutical & Surgical Supply Chain</span>
           </div>
           <div className="flex items-center space-x-3 text-[11px]">
-            <span className="text-[#00D2C4] font-semibold">● Live Supabase DB</span>
+            <span className="text-teal-600 dark:text-teal-400 font-semibold">● Live Supabase PostgreSQL</span>
             <span>•</span>
             <span>FEFO Stored Procedure Active</span>
           </div>
         </div>
       </footer>
+
 
       {/* Mobile Sticky Replenishment Footer */}
       <StickyReplenishmentFooter

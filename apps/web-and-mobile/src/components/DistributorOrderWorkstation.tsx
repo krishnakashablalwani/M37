@@ -4,21 +4,18 @@ import React, { useState, useEffect, useCallback } from 'react';
 import {
   Building2,
   CheckCircle2,
-  Clock,
   Truck,
   FileText,
-  XCircle,
   Package,
-  ArrowRight,
-  ShieldCheck,
-  AlertCircle,
-  Calendar,
   Layers,
-  Sparkles,
   Edit2,
   Check,
   Filter,
   Search,
+  Clock,
+  ShieldCheck,
+  AlertCircle,
+  ExternalLink,
 } from 'lucide-react';
 import { Organization } from '@/types';
 
@@ -36,14 +33,14 @@ export function DistributorOrderWorkstation({
   distributors,
   onViewInvoice,
 }: DistributorOrderWorkstationProps) {
-  // If current persona is not a distributor, pick the first distributor by default
-  const defaultDistributorId =
-    currentOrg?.org_type === 'DISTRIBUTOR'
-      ? currentOrg.id
-      : distributors.find((d) => d.org_type === 'DISTRIBUTOR')?.id || '';
-
-  const [selectedDistributorId, setSelectedDistributorId] = useState(defaultDistributorId);
+  const [selectedDistributorId, setSelectedDistributorId] = useState<string>('ALL');
   const [activeView, setActiveView] = useState<WorkstationView>('orders');
+
+  useEffect(() => {
+    if (currentOrg?.org_type === 'DISTRIBUTOR') {
+      setSelectedDistributorId(currentOrg.id);
+    }
+  }, [currentOrg]);
 
   // Orders State
   const [orders, setOrders] = useState<any[]>([]);
@@ -56,17 +53,20 @@ export function DistributorOrderWorkstation({
   const [batches, setBatches] = useState<any[]>([]);
   const [loadingBatches, setLoadingBatches] = useState(false);
   const [batchFilter, setBatchFilter] = useState<BatchFilter>('ALL');
+  const [searchBatch, setSearchBatch] = useState('');
   const [editingBatchId, setEditingBatchId] = useState<string | null>(null);
   const [editQtyValue, setEditQtyValue] = useState<number>(0);
   const [savingBatch, setSavingBatch] = useState(false);
 
-  // 1. Fetch Orders for selected distributor
+  // 1. Fetch Orders for selected distributor (or ALL)
   const fetchOrders = useCallback(() => {
-    if (!selectedDistributorId) return;
     setLoadingOrders(true);
-    let url = `/api/orders?distributor_id=${selectedDistributorId}`;
+    let url = `/api/orders?`;
+    if (selectedDistributorId && selectedDistributorId !== 'ALL') {
+      url += `distributor_id=${selectedDistributorId}&`;
+    }
     if (statusFilter !== 'ALL') {
-      url += `&status=${statusFilter}`;
+      url += `status=${statusFilter}&`;
     }
 
     fetch(url)
@@ -75,7 +75,6 @@ export function DistributorOrderWorkstation({
         if (data.success) {
           const fetchedOrders = data.orders || [];
           setOrders(fetchedOrders);
-          // Retain current selection or select the first one
           if (fetchedOrders.length > 0) {
             setSelectedOrder((prev: any) => {
               if (!prev) return fetchedOrders[0];
@@ -93,9 +92,13 @@ export function DistributorOrderWorkstation({
 
   // 2. Fetch Batches for Dense Inventory Grid
   const fetchBatches = useCallback(() => {
-    if (!selectedDistributorId) return;
     setLoadingBatches(true);
-    fetch(`/api/distributor/batches?distributor_id=${selectedDistributorId}&filter=${batchFilter}`)
+    let url = `/api/distributor/batches?filter=${batchFilter}`;
+    if (selectedDistributorId && selectedDistributorId !== 'ALL') {
+      url += `&distributor_id=${selectedDistributorId}`;
+    }
+
+    fetch(url)
       .then((res) => res.json())
       .then((data) => {
         if (data.success) {
@@ -145,7 +148,6 @@ export function DistributorOrderWorkstation({
   // Keyboard Shortcuts ('A' to accept, 'R' to reject active order)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Don't trigger if user is typing in an input
       if (['INPUT', 'TEXTAREA', 'SELECT'].includes((e.target as HTMLElement)?.tagName)) {
         return;
       }
@@ -156,7 +158,7 @@ export function DistributorOrderWorkstation({
         handleUpdateStatus(selectedOrder.id, 'ACCEPTED');
       } else if ((e.key === 'r' || e.key === 'R') && selectedOrder.status === 'ORDER_PLACED') {
         e.preventDefault();
-        handleUpdateStatus(selectedOrder.id, 'REJECTED', 'Order rejected via quick keyboard shortcut');
+        handleUpdateStatus(selectedOrder.id, 'REJECTED', 'Stock allocation shortage');
       }
     };
 
@@ -195,77 +197,87 @@ export function DistributorOrderWorkstation({
     switch (status) {
       case 'ORDER_PLACED':
         return (
-          <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-[#00D2C4]/15 text-[#00D2C4] border border-[#00D2C4]/30">
+          <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-teal-50 text-teal-800 border border-teal-200 dark:bg-teal-950/50 dark:text-teal-300 dark:border-teal-800">
             Awaiting Confirmation
           </span>
         );
       case 'ACCEPTED':
         return (
-          <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-blue-500/15 text-blue-400 border border-blue-500/30">
+          <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950/50 dark:text-blue-300 dark:border-blue-800">
             Accepted
           </span>
         );
       case 'PROCESSING':
       case 'PACKED':
         return (
-          <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-purple-500/15 text-purple-400 border border-purple-500/30">
+          <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 dark:bg-indigo-950/50 dark:text-indigo-300 dark:border-indigo-800">
             {status}
           </span>
         );
       case 'DISPATCHED':
         return (
-          <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/15 text-amber-400 border border-amber-500/30">
+          <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-50 text-amber-800 border border-amber-200 dark:bg-amber-950/50 dark:text-amber-300 dark:border-amber-800">
             Dispatched (Invoiced)
           </span>
         );
       case 'DELIVERED':
         return (
-          <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+          <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-800">
             Delivered
           </span>
         );
       case 'REJECTED':
       case 'CANCELLED':
         return (
-          <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-rose-500/15 text-rose-400 border border-rose-500/30">
+          <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-rose-50 text-rose-800 border border-rose-200 dark:bg-rose-950/50 dark:text-rose-300 dark:border-rose-800">
             {status}
           </span>
         );
       default:
         return (
-          <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-800 text-slate-400">
+          <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300">
             {status}
           </span>
         );
     }
   };
 
+  const filteredBatches = batches.filter((b) => {
+    if (!searchBatch) return true;
+    const q = searchBatch.toLowerCase();
+    return (
+      b.brand_name?.toLowerCase().includes(q) ||
+      b.batch_number?.toLowerCase().includes(q) ||
+      b.schedule?.toLowerCase().includes(q)
+    );
+  });
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 text-slate-100">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 text-slate-900 dark:text-slate-100">
       {/* Workstation Top Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-5 border-b border-[#1E2631]">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-5 border-b border-slate-200 dark:border-slate-800">
         <div>
           <div className="flex items-center space-x-2">
-            <span className="px-2 py-0.5 text-[10px] font-mono font-bold rounded bg-[#00D2C4]/10 text-[#00D2C4] border border-[#00D2C4]/20 uppercase">
-              Linear-Style Portal
+            <span className="px-2 py-0.5 text-[10px] font-mono font-bold rounded bg-teal-50 dark:bg-teal-950/50 text-teal-800 dark:text-teal-300 border border-teal-200 dark:border-teal-800 uppercase">
+              Operations Control
             </span>
-            <span className="text-xs text-slate-400 font-mono">FEFO Batch Management & Invoice Intake</span>
+            <span className="text-xs text-slate-500 font-mono">FEFO Allocation &amp; Warehouse Dispatch</span>
           </div>
-          <h2 className="text-xl sm:text-2xl font-black text-white mt-1 tracking-tight">
-            Distributor Order Intake & Dense Data Grid
+          <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white mt-1 tracking-tight">
+            Distributor Order Workstation &amp; Batch Grid
           </h2>
         </div>
 
         {/* View Toggle & Distributor Select */}
         <div className="flex items-center space-x-3 self-start sm:self-auto flex-wrap gap-2">
           {/* View Mode Toggle */}
-          <div className="flex items-center bg-[#12181F] border border-[#1E2631] p-1 rounded-xl text-xs font-mono">
+          <div className="flex items-center bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-1 rounded-xl text-xs font-mono">
             <button
               onClick={() => setActiveView('orders')}
               className={`px-3 py-1.5 rounded-lg font-semibold transition-all cursor-pointer ${
                 activeView === 'orders'
-                  ? 'bg-[#00D2C4] text-slate-950 font-bold shadow-sm'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-bold shadow-xs border border-slate-200 dark:border-slate-700'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               Order Intake Screen
@@ -274,8 +286,8 @@ export function DistributorOrderWorkstation({
               onClick={() => setActiveView('inventory_grid')}
               className={`px-3 py-1.5 rounded-lg font-semibold transition-all cursor-pointer ${
                 activeView === 'inventory_grid'
-                  ? 'bg-[#00D2C4] text-slate-950 font-bold shadow-sm'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-bold shadow-xs border border-slate-200 dark:border-slate-700'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               Zero-Waste Batch Grid
@@ -283,16 +295,19 @@ export function DistributorOrderWorkstation({
           </div>
 
           {/* Distributor Switcher */}
-          <div className="bg-[#12181F] border border-[#1E2631] rounded-xl px-2.5 py-1 text-xs">
+          <div className="bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-2.5 py-1.5 text-xs">
             <select
               value={selectedDistributorId}
               onChange={(e) => setSelectedDistributorId(e.target.value)}
-              className="bg-transparent text-white font-mono font-bold focus:outline-none cursor-pointer"
+              className="bg-transparent text-slate-900 dark:text-white font-mono font-bold focus:outline-none cursor-pointer"
             >
+              <option value="ALL" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">
+                All Stockists (Live Stream)
+              </option>
               {distributors
                 .filter((d) => d.org_type === 'DISTRIBUTOR')
                 .map((d) => (
-                  <option key={d.id} value={d.id} className="bg-[#12181F] text-white">
+                  <option key={d.id} value={d.id} className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">
                     {d.trade_name}
                   </option>
                 ))}
@@ -304,11 +319,11 @@ export function DistributorOrderWorkstation({
       {/* VIEW 1: SPLIT-PANE ORDER INTAKE SCREEN */}
       {activeView === 'orders' && (
         <div className="mt-6 grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-[600px]">
-          {/* Left Pane (35% on Desktop): Order Stream sorted by Urgency */}
-          <div className="lg:col-span-5 bg-[#12181F] border border-[#1E2631] rounded-xl flex flex-col overflow-hidden">
+          {/* Left Pane (40% on Desktop): Order Stream sorted by Urgency */}
+          <div className="lg:col-span-5 bg-white dark:bg-[#131926] border border-slate-200 dark:border-slate-800 rounded-xl flex flex-col overflow-hidden shadow-xs">
             {/* Status Filter Header */}
-            <div className="p-3 border-b border-[#1E2631] bg-[#090D11]/60 flex items-center justify-between text-xs font-mono">
-              <span className="text-slate-400 text-[11px] uppercase tracking-wider font-semibold">
+            <div className="p-3 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 flex items-center justify-between text-xs font-mono">
+              <span className="text-slate-500 dark:text-slate-400 text-[11px] uppercase tracking-wider font-semibold">
                 Incoming Stream ({orders.length})
               </span>
               <div className="flex items-center space-x-1">
@@ -318,26 +333,26 @@ export function DistributorOrderWorkstation({
                     onClick={() => setStatusFilter(st)}
                     className={`px-2 py-0.5 rounded text-[10px] font-semibold transition-all cursor-pointer ${
                       statusFilter === st
-                        ? 'bg-[#00D2C4] text-slate-950 font-bold'
-                        : 'text-slate-400 hover:text-white hover:bg-[#1E2631]'
+                        ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-bold shadow-xs border border-slate-200 dark:border-slate-700'
+                        : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                     }`}
                   >
-                    {st === 'ORDER_PLACED' ? 'New' : st === 'DISPATCHED' ? 'Inv' : st}
+                    {st === 'ORDER_PLACED' ? 'New' : st === 'DISPATCHED' ? 'Invoiced' : st}
                   </button>
                 ))}
               </div>
             </div>
 
             {/* Orders Stream List */}
-            <div className="flex-1 overflow-y-auto divide-y divide-[#1E2631]/80 max-h-[700px]">
+            <div className="flex-1 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800/80 max-h-[700px]">
               {loadingOrders ? (
                 <div className="flex flex-col items-center justify-center py-20 space-y-2">
-                  <div className="w-6 h-6 border-2 border-[#00D2C4] border-t-transparent rounded-full animate-spin" />
-                  <p className="text-xs text-slate-400 font-mono">Loading incoming orders...</p>
+                  <div className="w-6 h-6 border-2 border-teal-600 border-t-transparent rounded-full animate-spin" />
+                  <p className="text-xs text-slate-500 font-mono">Loading orders stream...</p>
                 </div>
               ) : orders.length === 0 ? (
-                <div className="text-center py-16 text-slate-500 font-mono text-xs">
-                  <Package className="w-8 h-8 text-slate-600 mx-auto mb-2" />
+                <div className="text-center py-16 text-slate-400 font-mono text-xs">
+                  <Package className="w-8 h-8 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
                   <span>No orders matching status filter</span>
                 </div>
               ) : (
@@ -349,30 +364,30 @@ export function DistributorOrderWorkstation({
                     <div
                       key={ord.id}
                       onClick={() => setSelectedOrder(ord)}
-                      className={`p-3.5 transition-all cursor-pointer border-l-2 ${
+                      className={`p-3.5 transition-all cursor-pointer border-l-3 ${
                         isSelected
-                          ? 'bg-[#090D11] border-l-[#00D2C4]'
-                          : 'hover:bg-[#090D11]/50 border-l-transparent'
+                          ? 'bg-teal-50/50 dark:bg-slate-800/60 border-l-teal-600 dark:border-l-teal-400'
+                          : 'hover:bg-slate-50 dark:hover:bg-slate-800/30 border-l-transparent'
                       }`}
                     >
                       <div className="flex items-start justify-between">
                         <div>
                           <div className="flex items-center space-x-1.5">
-                            <span className="font-mono text-xs font-bold text-white">{ord.order_number}</span>
+                            <span className="font-mono text-xs font-bold text-slate-900 dark:text-white">{ord.order_number}</span>
                             {isUrgent && (
-                              <span className="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-amber-500/15 text-amber-400 border border-amber-500/30">
+                              <span className="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-amber-50 text-amber-800 border border-amber-200 dark:bg-amber-950/50 dark:text-amber-300 dark:border-amber-800">
                                 2h Cutoff
                               </span>
                             )}
                           </div>
-                          <div className="text-xs font-semibold text-slate-300 mt-1">{ord.retailer_name}</div>
-                          <div className="text-[11px] text-slate-500 font-mono mt-0.5">
-                            {ord.items?.length || 0} items • {ord.created_at}
+                          <div className="text-xs font-semibold text-slate-800 dark:text-slate-200 mt-1">{ord.retailer_name}</div>
+                          <div className="text-[11px] text-slate-500 dark:text-slate-400 font-mono mt-0.5">
+                            {ord.items?.length || 0} items • {ord.distributor_name} • {ord.created_at}
                           </div>
                         </div>
 
                         <div className="text-right">
-                          <div className="font-mono text-sm font-extrabold text-[#00D2C4] tabular-nums">
+                          <div className="font-mono text-sm font-black text-teal-700 dark:text-teal-400 tabular-nums">
                             ₹{ord.grand_total.toFixed(2)}
                           </div>
                           <div className="mt-1">{getStatusBadge(ord.status)}</div>
@@ -381,11 +396,11 @@ export function DistributorOrderWorkstation({
 
                       {/* Quick Keyboard Shortcut Bar on Pending Orders */}
                       {ord.status === 'ORDER_PLACED' && isSelected && (
-                        <div className="mt-2.5 pt-2 border-t border-[#1E2631] flex items-center justify-between text-[10px] font-mono text-slate-400">
+                        <div className="mt-2.5 pt-2 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-[10px] font-mono text-slate-500">
                           <span>Keyboard Shortcuts:</span>
                           <div className="flex items-center space-x-1.5">
-                            <span className="bg-[#1E2631] px-1.5 py-0.5 rounded text-[#00D2C4] font-bold">[A] Accept</span>
-                            <span className="bg-[#1E2631] px-1.5 py-0.5 rounded text-rose-400 font-bold">[R] Reject</span>
+                            <span className="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 px-1.5 py-0.5 rounded text-teal-700 dark:text-teal-400 font-bold">[A] Accept</span>
+                            <span className="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 px-1.5 py-0.5 rounded text-rose-600 dark:text-rose-400 font-bold">[R] Reject</span>
                           </div>
                         </div>
                       )}
@@ -396,21 +411,21 @@ export function DistributorOrderWorkstation({
             </div>
           </div>
 
-          {/* Right Pane (65% on Desktop): Batch Assignment & Invoice Generator */}
-          <div className="lg:col-span-7 bg-[#12181F] border border-[#1E2631] rounded-xl flex flex-col overflow-hidden">
+          {/* Right Pane (60% on Desktop): Batch Assignment & Invoice Generator */}
+          <div className="lg:col-span-7 bg-white dark:bg-[#131926] border border-slate-200 dark:border-slate-800 rounded-xl flex flex-col overflow-hidden shadow-xs">
             {selectedOrder ? (
               <div className="flex-1 flex flex-col p-5 overflow-y-auto">
                 {/* Order Header */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[#1E2631]">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-200 dark:border-slate-800">
                   <div>
                     <div className="flex items-center space-x-2">
-                      <span className="font-mono text-base font-extrabold text-white">
+                      <span className="font-mono text-base font-black text-slate-900 dark:text-white">
                         {selectedOrder.order_number}
                       </span>
                       {getStatusBadge(selectedOrder.status)}
                     </div>
-                    <div className="text-xs text-slate-400 mt-1 font-mono">
-                      Retailer: <strong className="text-white font-sans">{selectedOrder.retailer_name}</strong> • Phone:{' '}
+                    <div className="text-xs text-slate-700 dark:text-slate-300 mt-1 font-mono">
+                      Retailer: <strong className="text-slate-900 dark:text-white font-sans">{selectedOrder.retailer_name}</strong> • Phone:{' '}
                       {selectedOrder.retailer_phone}
                     </div>
                     <div className="text-[11px] text-slate-500 font-mono mt-0.5">
@@ -423,18 +438,18 @@ export function DistributorOrderWorkstation({
                     {selectedOrder.status === 'ORDER_PLACED' && (
                       <div className="flex items-center space-x-2">
                         <button
-                          onClick={() => handleUpdateStatus(selectedOrder.id, 'REJECTED', 'Stock allocation shortage')}
+                          onClick={() => handleUpdateStatus(selectedOrder.id, 'REJECTED', 'Stock shortage')}
                           disabled={actionLoadingId === selectedOrder.id}
-                          className="px-3 py-2 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 text-xs font-bold transition-all cursor-pointer font-mono"
+                          className="px-3 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold transition-all cursor-pointer font-mono"
                         >
                           [R] Reject
                         </button>
                         <button
                           onClick={() => handleUpdateStatus(selectedOrder.id, 'ACCEPTED')}
                           disabled={actionLoadingId === selectedOrder.id}
-                          className="flex items-center space-x-1.5 px-4 py-2 rounded-lg bg-[#00D2C4] hover:bg-cyan-400 text-slate-950 text-xs font-black transition-all shadow-md active:scale-95 cursor-pointer font-mono"
+                          className="flex items-center space-x-1.5 px-4 py-1.5 rounded-lg bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold transition-all shadow-xs active:scale-95 cursor-pointer font-mono"
                         >
-                          <CheckCircle2 className="w-3.5 h-3.5" />
+                          <CheckCircle2 className="w-3.5 h-3.5 stroke-[2.5]" />
                           <span>[A] Accept Order</span>
                         </button>
                       </div>
@@ -444,10 +459,10 @@ export function DistributorOrderWorkstation({
                       <button
                         onClick={() => handleUpdateStatus(selectedOrder.id, 'PROCESSING')}
                         disabled={actionLoadingId === selectedOrder.id}
-                        className="flex items-center space-x-1.5 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition-all shadow-md active:scale-95 cursor-pointer font-mono"
+                        className="flex items-center space-x-1.5 px-4 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all shadow-xs active:scale-95 cursor-pointer font-mono"
                       >
                         <Package className="w-3.5 h-3.5" />
-                        <span>Move to Packing & Verification</span>
+                        <span>Move to Packing</span>
                       </button>
                     )}
 
@@ -455,10 +470,10 @@ export function DistributorOrderWorkstation({
                       <button
                         onClick={() => handleUpdateStatus(selectedOrder.id, 'DISPATCHED')}
                         disabled={actionLoadingId === selectedOrder.id}
-                        className="flex items-center space-x-1.5 px-4 py-2 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 text-xs font-black transition-all shadow-md shadow-amber-500/20 active:scale-95 cursor-pointer font-mono"
+                        className="flex items-center space-x-1.5 px-4 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-black transition-all shadow-xs active:scale-95 cursor-pointer font-mono"
                       >
                         <Truck className="w-3.5 h-3.5" />
-                        <span>Dispatch & Generate Tax Invoice</span>
+                        <span>Dispatch &amp; Generate Tax Invoice</span>
                       </button>
                     )}
 
@@ -466,7 +481,7 @@ export function DistributorOrderWorkstation({
                       <div className="flex items-center space-x-2">
                         <button
                           onClick={() => onViewInvoice(selectedOrder.id)}
-                          className="flex items-center space-x-1.5 px-3 py-2 rounded-lg bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/25 text-xs font-bold font-mono cursor-pointer"
+                          className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-teal-50 dark:bg-teal-950/40 text-teal-800 dark:text-teal-300 border border-teal-200 dark:border-teal-800 hover:bg-teal-100 text-xs font-bold font-mono cursor-pointer"
                         >
                           <FileText className="w-3.5 h-3.5" />
                           <span>View Tax Invoice</span>
@@ -474,7 +489,7 @@ export function DistributorOrderWorkstation({
                         <button
                           onClick={() => handleUpdateStatus(selectedOrder.id, 'DELIVERED')}
                           disabled={actionLoadingId === selectedOrder.id}
-                          className="flex items-center space-x-1 px-3 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold font-mono cursor-pointer"
+                          className="flex items-center space-x-1 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold font-mono cursor-pointer"
                         >
                           <span>Mark Delivered</span>
                         </button>
@@ -487,12 +502,12 @@ export function DistributorOrderWorkstation({
                 <div className="mt-5">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center space-x-1.5">
-                      <Layers className="w-4 h-4 text-[#00D2C4]" />
-                      <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-slate-300">
+                      <Layers className="w-4 h-4 text-teal-600 dark:text-teal-400" />
+                      <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
                         FEFO Batch Auto-Assignment Drawer
                       </h4>
                     </div>
-                    <span className="text-[10px] text-emerald-400 font-mono font-bold bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded">
+                    <span className="text-[10px] text-emerald-800 dark:text-emerald-300 font-mono font-bold bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 px-2 py-0.5 rounded">
                       FEFO Expiry Lock: Active
                     </span>
                   </div>
@@ -501,38 +516,38 @@ export function DistributorOrderWorkstation({
                     {selectedOrder.items?.map((it: any) => (
                       <div
                         key={it.id}
-                        className="rounded-lg border border-[#1E2631] bg-[#090D11] p-3 text-xs font-mono"
+                        className="rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/60 p-3.5 text-xs font-mono"
                       >
                         <div className="flex items-center justify-between">
                           <div>
-                            <span className="font-bold text-white text-sm font-sans">{it.brand_name}</span>
-                            <span className="text-slate-400 ml-2">({it.pack_size})</span>
+                            <span className="font-bold text-slate-900 dark:text-white text-sm font-sans">{it.brand_name}</span>
+                            <span className="text-slate-500 ml-2">({it.pack_size})</span>
                           </div>
                           <div className="text-right">
-                            <span className="text-[10px] text-slate-500 block">Unit PTR</span>
-                            <span className="font-bold text-slate-200">₹{it.unit_ptr.toFixed(2)}</span>
+                            <span className="text-[10px] text-slate-500 block font-semibold">Unit PTR</span>
+                            <span className="font-bold text-slate-900 dark:text-slate-100">₹{it.unit_ptr.toFixed(2)}</span>
                           </div>
                         </div>
 
                         {/* FEFO Batch Details */}
-                        <div className="mt-2.5 pt-2 border-t border-[#1E2631] grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px]">
+                        <div className="mt-2.5 pt-2 border-t border-slate-200 dark:border-slate-800 grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px]">
                           <div>
-                            <span className="text-[9px] text-slate-500 block uppercase">Allocated Batch</span>
-                            <strong className="text-[#00D2C4]">{it.batch_number || 'Auto-Allocated'}</strong>
+                            <span className="text-[9px] text-slate-500 block uppercase font-bold">Allocated Batch</span>
+                            <strong className="text-teal-700 dark:text-teal-400 font-bold">{it.batch_number || 'Auto-Allocated'}</strong>
                           </div>
                           <div>
-                            <span className="text-[9px] text-slate-500 block uppercase">Expiry Date</span>
-                            <strong className="text-emerald-400">Exp: {it.expiry_date || '2027-10-31'}</strong>
+                            <span className="text-[9px] text-slate-500 block uppercase font-bold">Expiry Date</span>
+                            <strong className="text-emerald-700 dark:text-emerald-400">Exp: {it.expiry_date || '2027-10-31'}</strong>
                           </div>
                           <div>
-                            <span className="text-[9px] text-slate-500 block uppercase">Requested / Free</span>
-                            <strong className="text-white">
-                              {it.requested_qty} + {it.free_scheme_qty || 0} Free
+                            <span className="text-[9px] text-slate-500 block uppercase font-bold">Quantity</span>
+                            <strong className="text-slate-900 dark:text-white">
+                              {it.requested_qty} units {it.free_scheme_qty ? `(+${it.free_scheme_qty} Free)` : ''}
                             </strong>
                           </div>
                           <div className="text-right">
-                            <span className="text-[9px] text-slate-500 block uppercase">Line Total</span>
-                            <strong className="text-white font-bold">₹{it.line_total.toFixed(2)}</strong>
+                            <span className="text-[9px] text-slate-500 block uppercase font-bold">Line Total</span>
+                            <strong className="text-slate-900 dark:text-white font-bold">₹{it.line_total.toFixed(2)}</strong>
                           </div>
                         </div>
                       </div>
@@ -541,22 +556,22 @@ export function DistributorOrderWorkstation({
                 </div>
 
                 {/* Commercial Reconciliation Breakdown */}
-                <div className="mt-6 pt-4 border-t border-[#1E2631] flex flex-col sm:flex-row items-end sm:items-center justify-between gap-4 font-mono text-xs">
-                  <div className="text-slate-400 text-[11px]">
+                <div className="mt-6 pt-4 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-end sm:items-center justify-between gap-4 font-mono text-xs">
+                  <div className="text-slate-500 text-[11px]">
                     Rule 46 GST Tax Compliant • Reverse Charge: No
                   </div>
                   <div className="space-y-1 text-right min-w-[200px]">
-                    <div className="flex justify-between text-slate-400">
+                    <div className="flex justify-between text-slate-600 dark:text-slate-400">
                       <span>Subtotal (PTR):</span>
-                      <span className="tabular-nums">₹{selectedOrder.subtotal.toFixed(2)}</span>
+                      <span className="tabular-nums font-semibold">₹{selectedOrder.subtotal.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-slate-400">
+                    <div className="flex justify-between text-slate-600 dark:text-slate-400">
                       <span>GST (CGST+SGST):</span>
-                      <span className="tabular-nums">₹{selectedOrder.tax_total.toFixed(2)}</span>
+                      <span className="tabular-nums font-semibold">₹{selectedOrder.tax_total.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-base font-extrabold text-white pt-1 border-t border-[#1E2631]">
+                    <div className="flex justify-between text-base font-black text-slate-900 dark:text-white pt-1 border-t border-slate-200 dark:border-slate-800">
                       <span>Invoice Total:</span>
-                      <span className="text-[#00D2C4] tabular-nums">
+                      <span className="text-teal-700 dark:text-teal-400 tabular-nums">
                         ₹{selectedOrder.grand_total.toFixed(2)}
                       </span>
                     </div>
@@ -564,9 +579,9 @@ export function DistributorOrderWorkstation({
                 </div>
               </div>
             ) : (
-              <div className="flex-1 flex flex-col items-center justify-center p-12 text-center text-slate-500 font-mono">
-                <Package className="w-10 h-10 text-slate-600 mb-2" />
-                <p className="text-sm font-bold text-white font-sans">No order selected</p>
+              <div className="flex-1 flex flex-col items-center justify-center p-12 text-center text-slate-400 font-mono">
+                <Package className="w-10 h-10 text-slate-300 dark:text-slate-600 mb-2" />
+                <p className="text-sm font-bold text-slate-800 dark:text-white font-sans">No order selected</p>
                 <p className="text-xs text-slate-500 mt-1">
                   Select an order from the left stream to inspect FEFO batch allocations.
                 </p>
@@ -578,39 +593,39 @@ export function DistributorOrderWorkstation({
 
       {/* VIEW 2: DENSE ZERO-WASTED-SPACE BATCH INVENTORY GRID */}
       {activeView === 'inventory_grid' && (
-        <div className="mt-6 bg-[#12181F] border border-[#1E2631] rounded-xl overflow-hidden shadow-xl">
-          {/* Quick Filter Pills */}
-          <div className="p-3.5 bg-[#090D11]/60 border-b border-[#1E2631] flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
+        <div className="mt-6 bg-white dark:bg-[#131926] border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-xs">
+          {/* Quick Filter Pills & Search */}
+          <div className="p-3.5 bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
             <div className="flex items-center space-x-1.5 flex-wrap gap-1">
-              <span className="text-slate-400 mr-1 flex items-center">
-                <Filter className="w-3.5 h-3.5 mr-1 text-[#00D2C4]" /> Filter Batches:
+              <span className="text-slate-500 mr-1 flex items-center">
+                <Filter className="w-3.5 h-3.5 mr-1 text-teal-600 dark:text-teal-400" /> Batches:
               </span>
               <button
                 onClick={() => setBatchFilter('ALL')}
                 className={`px-2.5 py-1 rounded text-[11px] font-semibold transition-all cursor-pointer ${
                   batchFilter === 'ALL'
-                    ? 'bg-[#00D2C4] text-slate-950 font-bold'
-                    : 'text-slate-400 hover:text-white hover:bg-[#1E2631]'
+                    ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-bold shadow-xs border border-slate-200 dark:border-slate-700'
+                    : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
-                All Batches ({batches.length})
+                All ({batches.length})
               </button>
               <button
                 onClick={() => setBatchFilter('EXPIRING_90')}
                 className={`px-2.5 py-1 rounded text-[11px] font-semibold transition-all cursor-pointer ${
                   batchFilter === 'EXPIRING_90'
-                    ? 'bg-amber-500 text-slate-950 font-bold'
-                    : 'text-amber-400 hover:text-white hover:bg-[#1E2631]'
+                    ? 'bg-amber-500 text-white font-bold'
+                    : 'text-amber-700 dark:text-amber-400 hover:underline'
                 }`}
               >
-                Expiring in &lt;90 Days
+                Expiring &lt;90 Days
               </button>
               <button
                 onClick={() => setBatchFilter('ZERO_STOCK')}
                 className={`px-2.5 py-1 rounded text-[11px] font-semibold transition-all cursor-pointer ${
                   batchFilter === 'ZERO_STOCK'
                     ? 'bg-rose-500 text-white font-bold'
-                    : 'text-rose-400 hover:text-white hover:bg-[#1E2631]'
+                    : 'text-rose-700 dark:text-rose-400 hover:underline'
                 }`}
               >
                 Zero Stock
@@ -619,105 +634,117 @@ export function DistributorOrderWorkstation({
                 onClick={() => setBatchFilter('ACTIVE')}
                 className={`px-2.5 py-1 rounded text-[11px] font-semibold transition-all cursor-pointer ${
                   batchFilter === 'ACTIVE'
-                    ? 'bg-emerald-500 text-slate-950 font-bold'
-                    : 'text-emerald-400 hover:text-white hover:bg-[#1E2631]'
+                    ? 'bg-emerald-600 text-white font-bold'
+                    : 'text-emerald-700 dark:text-emerald-400 hover:underline'
                 }`}
               >
                 Active
               </button>
             </div>
 
-            <div className="text-[11px] text-slate-500">
-              Double-click or click stock cell to edit inventory inline
+            {/* Quick Search in Batches */}
+            <div className="flex items-center space-x-2">
+              <div className="relative">
+                <input
+                  type="text"
+                  value={searchBatch}
+                  onChange={(e) => setSearchBatch(e.target.value)}
+                  placeholder="Filter by batch or SKU..."
+                  className="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-2.5 py-1 text-xs text-slate-900 dark:text-white focus:outline-none w-48 font-mono"
+                />
+              </div>
+              <span className="text-[11px] text-slate-500 hidden sm:inline">
+                Click stock to edit inline
+              </span>
             </div>
           </div>
 
           {/* Dense Table */}
           <div className="overflow-x-auto max-h-[650px] overflow-y-auto">
             <table className="w-full text-left text-xs font-mono">
-              <thead className="sticky top-0 z-10 bg-[#090D11] border-b border-[#1E2631] text-[10px] uppercase text-slate-400 tracking-wider">
+              <thead className="sticky top-0 z-10 bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 text-[10px] uppercase text-slate-500 dark:text-slate-400 tracking-wider font-bold">
                 <tr>
                   <th className="py-2.5 px-3">Batch #</th>
                   <th className="py-2.5 px-3">Medicine SKU</th>
-                  <th className="py-2.5 px-3">Expiry</th>
+                  <th className="py-2.5 px-3">Expiry Date</th>
                   <th className="py-2.5 px-3 text-right">PTR (₹)</th>
                   <th className="py-2.5 px-3 text-right">MRP (₹)</th>
-                  <th className="py-2.5 px-3 text-right">Physical Stock</th>
+                  <th className="py-2.5 px-3 text-right">Physical</th>
                   <th className="py-2.5 px-3 text-right">Reserved</th>
                   <th className="py-2.5 px-3 text-right">Available</th>
                   <th className="py-2.5 px-3 text-center">Status</th>
                   <th className="py-2.5 px-3 text-center">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#1E2631]/60">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800/80">
                 {loadingBatches ? (
                   <tr>
-                    <td colSpan={10} className="py-16 text-center text-slate-400">
-                      <div className="w-6 h-6 border-2 border-[#00D2C4] border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+                    <td colSpan={10} className="py-16 text-center text-slate-500">
+                      <div className="w-6 h-6 border-2 border-teal-600 border-t-transparent rounded-full animate-spin mx-auto mb-2" />
                       Loading inventory batches...
                     </td>
                   </tr>
-                ) : batches.length === 0 ? (
+                ) : filteredBatches.length === 0 ? (
                   <tr>
-                    <td colSpan={10} className="py-12 text-center text-slate-500">
+                    <td colSpan={10} className="py-12 text-center text-slate-400">
                       No batches found for this filter.
                     </td>
                   </tr>
                 ) : (
-                  batches.map((b) => {
+                  filteredBatches.map((b) => {
                     const isEditing = editingBatchId === b.id;
 
                     return (
-                      <tr key={b.id} className="hover:bg-[#090D11]/40 transition-colors">
-                        <td className="py-2 px-3 font-bold text-white whitespace-nowrap">
+                      <tr key={b.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                        <td className="py-2.5 px-3 font-bold text-slate-900 dark:text-white whitespace-nowrap">
                           {b.batch_number}
                         </td>
-                        <td className="py-2 px-3">
-                          <span className="font-bold text-white font-sans">{b.brand_name}</span>
-                          <span className="text-[10px] text-slate-400 block font-mono">
+                        <td className="py-2.5 px-3">
+                          <span className="font-bold text-slate-900 dark:text-white font-sans">{b.brand_name}</span>
+                          <span className="text-[10px] text-slate-500 block font-mono">
                             {b.pack_size} • {b.schedule}
                           </span>
                         </td>
-                        <td className="py-2 px-3 whitespace-nowrap">
+                        <td className="py-2.5 px-3 whitespace-nowrap">
                           <span
                             className={
-                              b.days_to_expiry <= 90 ? 'text-amber-400 font-bold' : 'text-emerald-400'
+                              b.days_to_expiry <= 90 ? 'text-amber-700 dark:text-amber-400 font-bold' : 'text-emerald-700 dark:text-emerald-400 font-medium'
                             }
                           >
                             {b.expiry_date}
                           </span>
-                          <span className="text-[10px] text-slate-500 block">
+                          <span className="text-[10px] text-slate-400 block">
                             ({b.days_to_expiry} days)
                           </span>
                         </td>
-                        <td className="py-2 px-3 text-right tabular-nums text-slate-200">
+                        <td className="py-2.5 px-3 text-right tabular-nums text-slate-700 dark:text-slate-200">
                           ₹{b.ptr.toFixed(2)}
                         </td>
-                        <td className="py-2 px-3 text-right tabular-nums text-slate-400">
+                        <td className="py-2.5 px-3 text-right tabular-nums text-slate-400">
                           ₹{b.mrp.toFixed(2)}
                         </td>
-                        <td className="py-2 px-3 text-right tabular-nums text-slate-300">
+                        <td className="py-2.5 px-3 text-right tabular-nums text-slate-600 dark:text-slate-300">
                           {b.physical_stock}
                         </td>
-                        <td className="py-2 px-3 text-right tabular-nums text-amber-400">
+                        <td className="py-2.5 px-3 text-right tabular-nums text-amber-700 dark:text-amber-400">
                           {b.reserved_qty}
                         </td>
 
                         {/* Inline Editable Available Stock Cell */}
-                        <td className="py-2 px-3 text-right tabular-nums">
+                        <td className="py-2.5 px-3 text-right tabular-nums">
                           {isEditing ? (
                             <div className="flex items-center justify-end space-x-1">
                               <input
                                 type="number"
                                 value={editQtyValue}
                                 onChange={(e) => setEditQtyValue(parseInt(e.target.value, 10) || 0)}
-                                className="w-16 bg-[#090D11] border border-[#00D2C4] px-1 py-0.5 rounded text-right text-white font-mono text-xs focus:outline-none"
+                                className="w-16 bg-white dark:bg-slate-900 border border-teal-600 px-1 py-0.5 rounded text-right text-slate-900 dark:text-white font-mono text-xs focus:outline-none"
                                 autoFocus
                               />
                               <button
                                 onClick={() => handleSaveBatchQty(b.id)}
                                 disabled={savingBatch}
-                                className="p-1 bg-[#00D2C4] text-slate-950 rounded hover:bg-cyan-400 cursor-pointer"
+                                className="p-1 bg-teal-600 text-white rounded hover:bg-teal-700 cursor-pointer"
                               >
                                 <Check className="w-3 h-3 stroke-[3]" />
                               </button>
@@ -733,41 +760,41 @@ export function DistributorOrderWorkstation({
                             >
                               <span
                                 className={`font-bold ${
-                                  b.available_qty === 0 ? 'text-rose-400' : 'text-white'
+                                  b.available_qty === 0 ? 'text-rose-600' : 'text-slate-900 dark:text-white'
                                 }`}
                               >
                                 {b.available_qty}
                               </span>
-                              <Edit2 className="w-2.5 h-2.5 text-slate-600 group-hover:text-[#00D2C4]" />
+                              <Edit2 className="w-2.5 h-2.5 text-slate-400 group-hover:text-teal-600" />
                             </div>
                           )}
                         </td>
 
-                        <td className="py-2 px-3 text-center">
+                        <td className="py-2.5 px-3 text-center">
                           {b.status === 'EXPIRING_SOON' && (
-                            <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-amber-500/15 text-amber-400 border border-amber-500/30">
+                            <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-50 text-amber-800 border border-amber-200 dark:bg-amber-950/50 dark:text-amber-300 dark:border-amber-800">
                               Expiring &lt;90d
                             </span>
                           )}
                           {b.status === 'ZERO_STOCK' && (
-                            <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-rose-500/15 text-rose-400 border border-rose-500/30">
+                            <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-rose-50 text-rose-800 border border-rose-200 dark:bg-rose-950/50 dark:text-rose-300 dark:border-rose-800">
                               Zero Stock
                             </span>
                           )}
                           {b.status === 'ACTIVE' && (
-                            <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                            <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-800">
                               Active
                             </span>
                           )}
                         </td>
 
-                        <td className="py-2 px-3 text-center">
+                        <td className="py-2.5 px-3 text-center">
                           <button
                             onClick={() => {
                               setEditingBatchId(b.id);
                               setEditQtyValue(b.available_qty);
                             }}
-                            className="text-[10px] text-[#00D2C4] hover:underline cursor-pointer"
+                            className="text-[10px] text-teal-700 dark:text-teal-400 hover:underline cursor-pointer font-bold"
                           >
                             Adjust
                           </button>

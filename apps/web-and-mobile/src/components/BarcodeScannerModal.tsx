@@ -76,35 +76,35 @@ export function BarcodeScannerModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="bg-[#12181F] border border-[#1E2631] rounded-2xl max-w-lg w-full p-6 text-white shadow-2xl relative overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 dark:bg-black/85 backdrop-blur-md animate-in fade-in duration-200">
+      <div className="bg-white dark:bg-[#12181F] border border-slate-200 dark:border-[#1E2631] rounded-2xl max-w-lg w-full p-6 text-slate-900 dark:text-white shadow-2xl relative overflow-hidden transition-colors">
         {/* Top Header */}
-        <div className="flex items-center justify-between pb-3 border-b border-[#1E2631]">
-          <div className="flex items-center space-x-2">
-            <div className="h-8 w-8 rounded-lg bg-[#00D2C4]/15 border border-[#00D2C4]/30 flex items-center justify-center text-[#00D2C4]">
+        <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-[#1E2631]">
+          <div className="flex items-center space-x-2.5">
+            <div className="h-8 w-8 rounded-lg bg-teal-50 dark:bg-teal-950/40 border border-teal-200 dark:border-teal-800/60 flex items-center justify-center text-teal-700 dark:text-teal-400">
               <ScanLine className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-white leading-tight">Barcode Scanner HUD</h3>
-              <p className="text-[11px] text-slate-400 font-mono">EAN-13 • GS1 DataBar • 1D/2D</p>
+              <h3 className="text-base font-bold text-slate-900 dark:text-white leading-tight">Barcode Scanner HUD</h3>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">EAN-13 • GS1 DataBar • 1D/2D</p>
             </div>
           </div>
 
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-[#1E2631] transition-colors cursor-pointer"
+            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#1E2631] transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Viewport View */}
-        <div className="mt-4 relative bg-[#090D11] border border-[#1E2631] rounded-xl h-56 flex flex-col items-center justify-center overflow-hidden">
+        <div className="mt-4 relative bg-slate-950 border border-slate-800 rounded-xl h-56 flex flex-col items-center justify-center overflow-hidden">
           {cameraActive ? (
             <video ref={videoRef} className="absolute inset-0 w-full h-full object-cover" />
           ) : (
             <div className="flex flex-col items-center text-center p-4 space-y-2 text-slate-400">
-              <Camera className="w-10 h-10 text-slate-600 animate-pulse" />
+              <Camera className="w-10 h-10 text-slate-500 animate-pulse" />
               <p className="text-xs font-mono">
                 Point camera at retail medicine box or tap quick-scan below
               </p>
@@ -112,9 +112,9 @@ export function BarcodeScannerModal({
           )}
 
           {/* Scanner Reticle Overlay */}
-          <div className="absolute inset-x-12 inset-y-8 border-2 border-dashed border-[#00D2C4]/60 rounded-xl flex items-center justify-center pointer-events-none">
+          <div className="absolute inset-x-12 inset-y-8 border-2 border-dashed border-teal-400/60 rounded-xl flex items-center justify-center pointer-events-none">
             {/* Animated Laser Scanning Line */}
-            <div className="w-full h-0.5 bg-gradient-to-r from-transparent via-[#00D2C4] to-transparent shadow-[0_0_8px_#00D2C4] animate-bounce" />
+            <div className="w-full h-0.5 bg-gradient-to-r from-transparent via-teal-400 to-transparent shadow-[0_0_8px_#14B8A6] animate-bounce" />
           </div>
 
           {scannedCode && (
@@ -126,8 +126,8 @@ export function BarcodeScannerModal({
         </div>
 
         {/* Quick Test Barcode Pills */}
-        <div className="mt-4 pt-3 border-t border-[#1E2631]">
-          <span className="text-[10px] text-slate-400 uppercase font-mono font-semibold block mb-2">
+        <div className="mt-4 pt-3 border-t border-slate-200 dark:border-[#1E2631]">
+          <span className="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-mono font-semibold block mb-2">
             Counter Quick-Scan (1-Tap Simulation):
           </span>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -135,13 +135,13 @@ export function BarcodeScannerModal({
               <button
                 key={item.code}
                 onClick={() => handleSelectBarcode(item.code)}
-                className="flex items-center justify-between p-2 rounded-lg bg-[#090D11] hover:bg-[#1E2631] border border-[#1E2631] hover:border-[#00D2C4]/50 transition-all text-left text-xs font-mono cursor-pointer active:scale-95"
+                className="flex items-center justify-between p-2 rounded-lg bg-slate-50 hover:bg-slate-100 dark:bg-[#090D11] dark:hover:bg-[#1E2631] border border-slate-200 dark:border-[#1E2631] hover:border-teal-500/50 transition-all text-left text-xs font-mono cursor-pointer active:scale-95"
               >
                 <div>
-                  <span className="text-slate-200 font-bold block">{item.label}</span>
-                  <span className="text-[10px] text-[#00D2C4]">{item.code}</span>
+                  <span className="text-slate-800 dark:text-slate-200 font-bold block">{item.label}</span>
+                  <span className="text-[10px] text-teal-700 dark:text-teal-400">{item.code}</span>
                 </div>
-                <Zap className="w-3.5 h-3.5 text-slate-500 hover:text-[#00D2C4]" />
+                <Zap className="w-3.5 h-3.5 text-slate-400 hover:text-teal-600 dark:hover:text-teal-400" />
               </button>
             ))}
           </div>
