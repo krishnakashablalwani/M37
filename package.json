@@ -11,6 +11,7 @@
     "dev": "npm --prefix apps/web-and-mobile run dev",
     "build": "npm --prefix apps/web-and-mobile run build",
     "start": "npm --prefix apps/web-and-mobile run start",
-    "lint": "npm --prefix apps/web-and-mobile run lint"
+    "lint": "npm --prefix apps/web-and-mobile run lint",
+    "test": "npm --prefix apps/web-and-mobile test"
   }
 }
