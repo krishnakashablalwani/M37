@@ -39,6 +39,21 @@ interface ReplenishItem {
     alt_ptr: number;
   } | null;
   split_accepted?: boolean;
+  spike_analysis?: {
+    isSpikeDetected: boolean;
+    confidencePct: number;
+    anomalyType: string;
+    baselineDailySales: number;
+    spikeDailySales: number;
+    spikeFactor: number;
+    rawSuggestedQty: number;
+    dampenedSuggestedQty: number;
+    excessOrderRiskQty: number;
+    capitalAtRisk: number;
+    cautionMessage: string;
+    recommendedAction: string;
+  };
+  spike_excluded?: boolean;
 }
 
 export function AutoReplenishDeck({ currentOrg, onPunchOrder }: AutoReplenishDeckProps) {
@@ -72,6 +87,21 @@ export function AutoReplenishDeck({ currentOrg, onPunchOrder }: AutoReplenishDec
         available: 240,
       },
       shortfall: null,
+      spike_analysis: {
+        isSpikeDetected: true,
+        confidencePct: 94,
+        anomalyType: 'CHRONIC_PATIENT_BULK_PURCHASE',
+        baselineDailySales: 2.1,
+        spikeDailySales: 8.5,
+        spikeFactor: 4.1,
+        rawSuggestedQty: 48,
+        dampenedSuggestedQty: 15,
+        excessOrderRiskQty: 33,
+        capitalAtRisk: 901,
+        cautionMessage: '⚠️ Caution: One-Time Outlier Surge Detected. A single customer bought 45 units on Oct 20 (likely 3-4 months chronic supply). Store normal velocity is only ~2.1 units/day.',
+        recommendedAction: 'Dumb ERPs order 48 units. M37 recommends dampening order to 15 units to prevent ₹901 in dead stock.',
+      },
+      spike_excluded: false,
     },
     {
       id: 'item-2',
@@ -166,6 +196,25 @@ export function AutoReplenishDeck({ currentOrg, onPunchOrder }: AutoReplenishDec
       items.map((it) => {
         if (it.id === itemId) {
           return { ...it, split_accepted: true };
+        }
+        return it;
+      })
+    );
+  };
+
+  const toggleExcludeSpike = (itemId: string) => {
+    triggerTactile(itemId);
+    setDraftItems((items) =>
+      items.map((it) => {
+        if (it.id === itemId && it.spike_analysis) {
+          const isExcluding = !it.spike_excluded;
+          return {
+            ...it,
+            spike_excluded: isExcluding,
+            suggested_qty: isExcluding
+              ? it.spike_analysis.dampenedSuggestedQty
+              : it.spike_analysis.rawSuggestedQty,
+          };
         }
         return it;
       })
@@ -354,6 +403,68 @@ export function AutoReplenishDeck({ currentOrg, onPunchOrder }: AutoReplenishDec
               <span className="text-[10px] text-emerald-700 dark:text-emerald-300 font-bold uppercase bg-emerald-100 dark:bg-emerald-900/60 px-2 py-0.5 rounded">
                 Optimized
               </span>
+            </div>
+          </div>
+        )}
+
+        {/* Anomaly & One-Time Spike Caution Alert (Chronic Patient 3-4 months purchase) */}
+        {item.spike_analysis && item.spike_analysis.isSpikeDetected && (
+          <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800">
+            <div
+              className={`rounded-xl p-3.5 border transition-all ${
+                item.spike_excluded
+                  ? 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-300 dark:border-emerald-800'
+                  : 'bg-amber-50 dark:bg-amber-950/40 border-amber-300 dark:border-amber-700/80'
+              }`}
+            >
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="space-y-1">
+                  <div className="flex items-center space-x-2">
+                    <AlertTriangle
+                      className={`w-4 h-4 shrink-0 ${
+                        item.spike_excluded ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'
+                      }`}
+                    />
+                    <span className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                      <span>One-Time Surge Caution</span>
+                      <span className="text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-900/50 text-amber-800 dark:text-amber-300">
+                        Chronic Patient ~{item.spike_analysis.spikeFactor}x Surge
+                      </span>
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">
+                    {item.spike_analysis.cautionMessage}
+                  </p>
+                  <div className="text-[11px] font-mono pt-1 text-slate-700 dark:text-slate-400 flex items-center gap-3 flex-wrap">
+                    <span>
+                      Dumb ERP Order:{' '}
+                      <del className="text-rose-600 dark:text-rose-400 font-bold">{item.spike_analysis.rawSuggestedQty} units</del>
+                    </span>
+                    <span>→</span>
+                    <span>
+                      Recommended Dampened:{' '}
+                      <strong className="text-emerald-700 dark:text-emerald-400 font-bold">
+                        {item.spike_analysis.dampenedSuggestedQty} units
+                      </strong>
+                    </span>
+                    <span className="text-amber-700 dark:text-amber-400 font-bold">
+                      (Saves ₹{item.spike_analysis.capitalAtRisk.toLocaleString('en-IN')} working capital)
+                    </span>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => toggleExcludeSpike(item.id)}
+                  className={`px-3 py-2 rounded-lg text-xs font-bold shrink-0 transition-all cursor-pointer font-mono shadow-xs active:scale-95 ${
+                    item.spike_excluded
+                      ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                      : 'bg-amber-500 hover:bg-amber-600 text-slate-950 font-black'
+                  }`}
+                >
+                  {item.spike_excluded ? '✓ Spike Excluded (Safe Mode)' : '⚡ Exclude Spike & Order Dampened'}
+                </button>
+              </div>
             </div>
           </div>
         )}

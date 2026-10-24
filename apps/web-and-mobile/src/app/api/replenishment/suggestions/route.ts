@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getDbPool } from '@/lib/db';
+import { detectReplenishmentSpike } from '@/lib/replenishment/anomalyDetector';
 
 export async function GET(request: NextRequest) {
   try {
@@ -130,6 +131,18 @@ export async function GET(request: NextRequest) {
         };
       }
 
+      // Anomaly Spike Detection for one-time 3-4 months patient purchases
+      const spikeAnalysis = detectReplenishmentSpike({
+        brandName: item.brand_name,
+        currentStock,
+        minThreshold,
+        targetStock: calculatedTarget,
+        avgDailySales: avgDaily,
+        leadTimeDays: leadTime,
+        safetyBufferDays: safetyBuffer,
+        unitPtr: Number(primary.ptr),
+      });
+
       suggestions.push({
         id: item.setting_id || `sugg-${item.master_product_id}`,
         brand_name: item.brand_name,
@@ -147,6 +160,7 @@ export async function GET(request: NextRequest) {
             ? 'Verified POS Sync'
             : 'Based on 7-Day Velocity',
         urgency,
+        spike_analysis: spikeAnalysis,
         primary_distributor: {
           id: primary.distributor_id,
           name: primary.distributor_name,

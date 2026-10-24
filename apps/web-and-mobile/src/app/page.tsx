@@ -16,6 +16,7 @@ import { DistributorOrderWorkstation } from '@/components/DistributorOrderWorkst
 import { LedgerAndRMATab } from '@/components/LedgerAndRMATab';
 import { GSTInvoiceModal } from '@/components/GSTInvoiceModal';
 import { OrderSuccessModal } from '@/components/OrderSuccessModal';
+import { VerificationHubModal } from '@/components/VerificationHubModal';
 import { MasterProduct, Organization, CartItem, DistributorBatchListing, ProductCategory, DrugSchedule } from '@/types';
 import { Pill, AlertCircle } from 'lucide-react';
 
@@ -41,6 +42,7 @@ export default function Home() {
   const [complianceBlockedItem, setComplianceBlockedItem] = useState<{ name: string; schedule: string } | null>(null);
   const [confirmedOrder, setConfirmedOrder] = useState<{ number: string; total: number } | null>(null);
   const [viewInvoiceId, setViewInvoiceId] = useState<string | null>(null);
+  const [verificationModalOpen, setVerificationModalOpen] = useState(false);
 
   // Theme State (Default to Light Mode)
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
@@ -183,6 +185,7 @@ export default function Home() {
         setPincode={setPincode}
         theme={theme}
         setTheme={handleToggleTheme}
+        onOpenVerification={() => setVerificationModalOpen(true)}
       />
 
       {/* Main Content Area */}
@@ -354,6 +357,12 @@ export default function Home() {
         invoiceIdOrOrderId={viewInvoiceId}
         isOpen={Boolean(viewInvoiceId)}
         onClose={() => setViewInvoiceId(null)}
+      />
+
+      {/* Regulatory Verification & Offline Token Bypass Hub Modal */}
+      <VerificationHubModal
+        isOpen={verificationModalOpen}
+        onClose={() => setVerificationModalOpen(false)}
       />
     </div>
   );

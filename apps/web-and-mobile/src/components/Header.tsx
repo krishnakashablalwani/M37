@@ -34,6 +34,7 @@ interface HeaderProps {
   setPincode: (p: string) => void;
   theme: 'light' | 'dark';
   setTheme: (t: 'light' | 'dark') => void;
+  onOpenVerification?: () => void;
 }
 
 export function Header({
@@ -48,6 +49,7 @@ export function Header({
   setPincode,
   theme,
   setTheme,
+  onOpenVerification,
 }: HeaderProps) {
   const totalCartCount = cart.reduce((acc, it) => acc + it.quantity, 0);
   const totalCartValue = cart.reduce((acc, it) => acc + (it.unit_ptr * it.quantity), 0);
@@ -148,6 +150,19 @@ export function Header({
                 )}
               </div>
             </div>
+
+            {/* Regulatory Verification & Token Bypass Hub Button */}
+            {onOpenVerification && (
+              <button
+                type="button"
+                onClick={onOpenVerification}
+                className="hidden md:flex items-center space-x-1.5 px-2.5 py-1.5 rounded-lg bg-teal-50 hover:bg-teal-100 dark:bg-teal-950/40 dark:hover:bg-teal-900/50 text-teal-800 dark:text-teal-300 border border-teal-200 dark:border-teal-800 text-xs font-mono font-bold transition-all cursor-pointer shadow-xs active:scale-95"
+                title="Verify GSTIN Mod-36, Drug License Form 20/21, Doctor NMC/SMC UID, and Marg ERP Bridge"
+              >
+                <ShieldCheck className="w-3.5 h-3.5 stroke-[2.5]" />
+                <span>Verification Hub</span>
+              </button>
+            )}
 
             {/* Credit Limit Micro-Gauge */}
             <div className="hidden lg:flex items-center space-x-2 bg-slate-100 dark:bg-[#121212] border border-slate-200 dark:border-neutral-800 px-2.5 py-1.5 rounded-lg text-xs font-mono">

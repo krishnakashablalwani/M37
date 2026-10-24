@@ -16,8 +16,10 @@ import {
   ShieldCheck,
   AlertCircle,
   ExternalLink,
+  Download,
 } from 'lucide-react';
 import { Organization } from '@/types';
+import { generateMargOrderFile, generateProfitMakerOrderFile } from '@/lib/erp/margProfitMakerBridge';
 
 interface DistributorOrderWorkstationProps {
   currentOrg: Organization | null;
@@ -495,6 +497,97 @@ export function DistributorOrderWorkstation({
                         </button>
                       </div>
                     )}
+                  </div>
+                </div>
+
+                {/* Local ERP Integration Bridge (Marg & ProfitMaker) */}
+                <div className="mt-4 p-3 rounded-xl bg-slate-100 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div className="flex items-center space-x-2">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                      <span className="text-xs font-bold text-slate-800 dark:text-slate-200 font-mono">
+                        Local ERP Edge Bridge:
+                      </span>
+                      <span className="text-[11px] text-slate-500 font-mono hidden md:inline">
+                        Direct Inward Voucher (Bypasses manual cloud punching)
+                      </span>
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                      <button
+                        onClick={() => {
+                          const payload = {
+                            orderNumber: selectedOrder.order_number,
+                            orderDate: new Date(selectedOrder.created_at || Date.now()).toISOString().split('T')[0],
+                            retailerName: selectedOrder.retailer_name || 'Retail Chemist',
+                            retailerGstin: selectedOrder.retailer_gstin,
+                            distributorName: selectedOrder.distributor_name || 'Wholesale Stockist',
+                            totalAmount: Number(selectedOrder.grand_total || selectedOrder.subtotal || 0),
+                            items: (selectedOrder.items || []).map((it: any) => ({
+                              skuCode: it.sku_code || it.master_product_id?.slice(0, 8) || 'MED-01',
+                              brandName: it.brand_name || 'Pharma Drug',
+                              batchNumber: it.batch_number,
+                              quantity: it.quantity || it.requested_qty || 1,
+                              freeSchemeQty: it.free_scheme_qty || 0,
+                              ptr: Number(it.unit_ptr || 0),
+                              mrp: Number(it.mrp || (it.unit_ptr ? it.unit_ptr * 1.3 : 100)),
+                              discountPct: 0,
+                              gstPct: Number(it.gst_pct || 12),
+                            })),
+                          };
+                          const content = generateMargOrderFile(payload);
+                          const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+                          const url = URL.createObjectURL(blob);
+                          const a = document.createElement('a');
+                          a.href = url;
+                          a.download = `${selectedOrder.order_number}_MARG.ord`;
+                          a.click();
+                          URL.revokeObjectURL(url);
+                        }}
+                        className="flex items-center space-x-1 px-2.5 py-1 rounded bg-teal-600 hover:bg-teal-700 text-white text-[11px] font-bold font-mono shadow-xs cursor-pointer"
+                        title="Download standard Marg ERP Inward .ORD file for F10 import"
+                      >
+                        <Download className="w-3 h-3" />
+                        <span>Export Marg (.ORD)</span>
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          const payload = {
+                            orderNumber: selectedOrder.order_number,
+                            orderDate: new Date(selectedOrder.created_at || Date.now()).toISOString().split('T')[0],
+                            retailerName: selectedOrder.retailer_name || 'Retail Chemist',
+                            retailerGstin: selectedOrder.retailer_gstin,
+                            distributorName: selectedOrder.distributor_name || 'Wholesale Stockist',
+                            totalAmount: Number(selectedOrder.grand_total || selectedOrder.subtotal || 0),
+                            items: (selectedOrder.items || []).map((it: any) => ({
+                              skuCode: it.sku_code || it.master_product_id?.slice(0, 8) || 'MED-01',
+                              brandName: it.brand_name || 'Pharma Drug',
+                              batchNumber: it.batch_number,
+                              quantity: it.quantity || it.requested_qty || 1,
+                              freeSchemeQty: it.free_scheme_qty || 0,
+                              ptr: Number(it.unit_ptr || 0),
+                              mrp: Number(it.mrp || (it.unit_ptr ? it.unit_ptr * 1.3 : 100)),
+                              discountPct: 0,
+                              gstPct: Number(it.gst_pct || 12),
+                            })),
+                          };
+                          const content = generateProfitMakerOrderFile(payload);
+                          const blob = new Blob([content], { type: 'text/csv;charset=utf-8' });
+                          const url = URL.createObjectURL(blob);
+                          const a = document.createElement('a');
+                          a.href = url;
+                          a.download = `${selectedOrder.order_number}_PROFITMAKER.csv`;
+                          a.click();
+                          URL.revokeObjectURL(url);
+                        }}
+                        className="flex items-center space-x-1 px-2.5 py-1 rounded bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-900 dark:text-white text-[11px] font-bold font-mono shadow-xs cursor-pointer"
+                        title="Download ProfitMaker Inward CSV format"
+                      >
+                        <Download className="w-3 h-3" />
+                        <span>ProfitMaker CSV</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
 
