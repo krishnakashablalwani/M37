@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "PharmaSync B2B — High-Density Medicine & Surgical Supply Chain",
+  title: "M37 — High-Density Medicine & Surgical Supply Chain",
   description:
-    "Utilitarian B2B multi-distributor ordering, automated replenishment triage, and FEFO batch fulfillment for retail pharmacies and stockists.",
+    "M37 B2B multi-distributor ordering, automated replenishment triage, and FEFO batch fulfillment for retail pharmacies and stockists.",
 };
 
 export default function RootLayout({

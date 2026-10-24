@@ -8,7 +8,7 @@ async function main() {
   const startTime = Date.now();
 
   console.log('╔══════════════════════════════════════════════════════════════════════════╗');
-  console.log('║        PharmaSync B2B — Master In-Depth Automated Test Suite             ║');
+  console.log('║               M37 — Master In-Depth Automated Test Suite                 ║');
   console.log('║       End-to-End Database, Regulatory Compliance & Workflow Audit        ║');
   console.log('╚══════════════════════════════════════════════════════════════════════════╝');
 

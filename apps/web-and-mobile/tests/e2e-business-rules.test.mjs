@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 
 console.log('----------------------------------------------------');
-console.log('🧪 PharmaSync B2B: Automated Business Rules & E2E Test Suite');
+console.log('🧪 M37 B2B: Automated Business Rules & E2E Test Suite');
 console.log('----------------------------------------------------\n');
 
 // -----------------------------------------------------------------------------

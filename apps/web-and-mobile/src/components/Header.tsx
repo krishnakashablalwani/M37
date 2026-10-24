@@ -84,7 +84,7 @@ export function Header({
               <div className="flex flex-col">
                 <div className="flex items-center space-x-1.5">
                   <span className="font-extrabold text-base tracking-tight text-slate-900 dark:text-white">
-                    PharmaSync
+                    M37
                   </span>
                   <span className="px-1.5 py-0.5 text-[9px] font-bold uppercase rounded bg-teal-50 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300 border border-teal-200 dark:border-teal-700 font-mono">
                     B2B

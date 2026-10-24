@@ -46,7 +46,7 @@ export default function Home() {
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
 
   useEffect(() => {
-    const saved = localStorage.getItem('pharmasync-theme') as 'light' | 'dark' | null;
+    const saved = (localStorage.getItem('m37-theme') || localStorage.getItem('pharmasync-theme')) as 'light' | 'dark' | null;
     if (saved) {
       setTheme(saved);
       if (saved === 'dark') document.documentElement.classList.add('dark');
@@ -58,7 +58,7 @@ export default function Home() {
 
   const handleToggleTheme = (newTheme: 'light' | 'dark') => {
     setTheme(newTheme);
-    localStorage.setItem('pharmasync-theme', newTheme);
+    localStorage.setItem('m37-theme', newTheme);
     if (newTheme === 'dark') document.documentElement.classList.add('dark');
     else document.documentElement.classList.remove('dark');
   };
@@ -283,7 +283,7 @@ export default function Home() {
       <footer className="bg-white dark:bg-[#0A0A0A] border-t border-slate-200 dark:border-neutral-800 py-4 text-center text-xs text-slate-500 dark:text-neutral-400 font-mono transition-colors">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
           <div className="flex items-center space-x-2">
-            <span className="font-bold text-slate-900 dark:text-neutral-200">PharmaSync B2B</span>
+            <span className="font-bold text-slate-900 dark:text-neutral-200">M37</span>
             <span>•</span>
             <span>Telangana Pharmaceutical & Surgical Supply Chain</span>
           </div>
