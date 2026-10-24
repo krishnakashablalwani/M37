@@ -143,10 +143,10 @@ export function AdminCatalogTab() {
       </div>
 
       {/* Table */}
-      <div className="mt-4 bg-white dark:bg-[#131926] border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-xs">
+      <div className="mt-4 bg-white dark:bg-[#0A0A0A] border border-slate-200 dark:border-neutral-800 rounded-xl overflow-hidden shadow-xs">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs font-mono">
-            <thead className="bg-slate-50 dark:bg-slate-900 text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800 uppercase tracking-wider text-[10px] font-bold">
+            <thead className="bg-slate-50 dark:bg-[#121212] text-slate-500 dark:text-neutral-400 border-b border-slate-200 dark:border-neutral-800 uppercase tracking-wider text-[10px] font-bold">
               <tr>
                 <th className="py-3 px-4">SKU &amp; Brand Name</th>
                 <th className="py-3 px-4">Generic Composition</th>
@@ -156,7 +156,7 @@ export function AdminCatalogTab() {
                 <th className="py-3 px-4 text-right">Mapped Stockists</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-slate-800/80 text-slate-700 dark:text-slate-300">
+            <tbody className="divide-y divide-slate-100 dark:divide-neutral-800/80 text-slate-700 dark:text-neutral-300">
               {loading ? (
                 <tr>
                   <td colSpan={6} className="py-8 text-center text-slate-400">
@@ -219,68 +219,68 @@ export function AdminCatalogTab() {
 
       {/* Modal: Create Master SKU */}
       {showAddModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
-          <div className="bg-white dark:bg-[#131926] border border-slate-200 dark:border-slate-800 rounded-2xl max-w-xl w-full p-6 text-slate-900 dark:text-white shadow-xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 dark:bg-black/80 backdrop-blur-xs">
+          <div className="bg-white dark:bg-[#0A0A0A] border border-slate-200 dark:border-neutral-800 rounded-2xl max-w-xl w-full p-6 text-slate-900 dark:text-white shadow-xl">
             <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1">Create Canonical Master SKU</h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">
+            <p className="text-xs text-slate-500 dark:text-neutral-400 mb-4">
               All distributors will map their inventory batches to this master SKU.
             </p>
 
             <form onSubmit={handleCreateSku} className="space-y-3 text-xs">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-slate-600 dark:text-slate-400 mb-1 font-semibold">SKU Code (Unique)</label>
+                  <label className="block text-slate-600 dark:text-neutral-400 mb-1 font-semibold">SKU Code (Unique)</label>
                   <input
                     type="text"
                     required
                     value={skuCode}
                     onChange={(e) => setSkuCode(e.target.value.toUpperCase())}
                     placeholder="e.g. MED-AMOX-625"
-                    className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg p-2 font-mono text-slate-900 dark:text-white focus:outline-none focus:border-teal-600"
+                    className="w-full bg-slate-50 dark:bg-[#121212] border border-slate-300 dark:border-neutral-700 rounded-lg p-2 font-mono text-slate-900 dark:text-white focus:outline-none focus:border-teal-600"
                   />
                 </div>
                 <div>
-                  <label className="block text-slate-600 dark:text-slate-400 mb-1 font-semibold">Brand Name</label>
+                  <label className="block text-slate-600 dark:text-neutral-400 mb-1 font-semibold">Brand Name</label>
                   <input
                     type="text"
                     required
                     value={brandName}
                     onChange={(e) => setBrandName(e.target.value)}
                     placeholder="e.g. Augmentin 625 Duo"
-                    className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg p-2 text-slate-900 dark:text-white focus:outline-none focus:border-teal-600"
+                    className="w-full bg-slate-50 dark:bg-[#121212] border border-slate-300 dark:border-neutral-700 rounded-lg p-2 text-slate-900 dark:text-white focus:outline-none focus:border-teal-600"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-slate-600 dark:text-slate-400 mb-1 font-semibold">Generic / Salt Composition</label>
+                <label className="block text-slate-600 dark:text-neutral-400 mb-1 font-semibold">Generic / Salt Composition</label>
                 <input
                   type="text"
                   value={genericComp}
                   onChange={(e) => setGenericComp(e.target.value)}
                   placeholder="e.g. Amoxicillin 500mg + Clavulanic Acid 125mg"
-                  className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg p-2 text-slate-900 dark:text-white focus:outline-none focus:border-teal-600"
+                  className="w-full bg-slate-50 dark:bg-[#121212] border border-slate-300 dark:border-neutral-700 rounded-lg p-2 text-slate-900 dark:text-white focus:outline-none focus:border-teal-600"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-slate-600 dark:text-slate-400 mb-1 font-semibold">Manufacturer</label>
+                  <label className="block text-slate-600 dark:text-neutral-400 mb-1 font-semibold">Manufacturer</label>
                   <input
                     type="text"
                     required
                     value={manufacturer}
                     onChange={(e) => setManufacturer(e.target.value)}
                     placeholder="e.g. GlaxoSmithKline"
-                    className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg p-2 text-slate-900 dark:text-white focus:outline-none focus:border-teal-600"
+                    className="w-full bg-slate-50 dark:bg-[#121212] border border-slate-300 dark:border-neutral-700 rounded-lg p-2 text-slate-900 dark:text-white focus:outline-none focus:border-teal-600"
                   />
                 </div>
                 <div>
-                  <label className="block text-slate-600 dark:text-slate-400 mb-1 font-semibold">Category</label>
+                  <label className="block text-slate-600 dark:text-neutral-400 mb-1 font-semibold">Category</label>
                   <select
                     value={category}
                     onChange={(e: any) => setCategory(e.target.value)}
-                    className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg p-2 text-slate-900 dark:text-white focus:outline-none focus:border-teal-600"
+                    className="w-full bg-slate-50 dark:bg-[#121212] border border-slate-300 dark:border-neutral-700 rounded-lg p-2 text-slate-900 dark:text-white focus:outline-none focus:border-teal-600"
                   >
                     <option value="PHARMA">PHARMA</option>
                     <option value="SURGICAL">SURGICAL</option>
@@ -291,11 +291,11 @@ export function AdminCatalogTab() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-slate-600 dark:text-slate-400 mb-1 font-semibold">Drug Schedule</label>
+                  <label className="block text-slate-600 dark:text-neutral-400 mb-1 font-semibold">Drug Schedule</label>
                   <select
                     value={schedule}
                     onChange={(e: any) => setSchedule(e.target.value)}
-                    className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg p-2 text-slate-900 dark:text-white focus:outline-none focus:border-teal-600"
+                    className="w-full bg-slate-50 dark:bg-[#121212] border border-slate-300 dark:border-neutral-700 rounded-lg p-2 text-slate-900 dark:text-white focus:outline-none focus:border-teal-600"
                   >
                     <option value="SCHEDULE_H">Schedule H (Rx Only)</option>
                     <option value="SCHEDULE_H1">Schedule H1 (High Risk)</option>
@@ -304,47 +304,47 @@ export function AdminCatalogTab() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-slate-600 dark:text-slate-400 mb-1 font-semibold">Pack Size</label>
+                  <label className="block text-slate-600 dark:text-neutral-400 mb-1 font-semibold">Pack Size</label>
                   <input
                     type="text"
                     required
                     value={packSize}
                     onChange={(e) => setPackSize(e.target.value)}
                     placeholder="e.g. 10 Tablets / Strip"
-                    className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg p-2 text-slate-900 dark:text-white focus:outline-none focus:border-teal-600"
+                    className="w-full bg-slate-50 dark:bg-[#121212] border border-slate-300 dark:border-neutral-700 rounded-lg p-2 text-slate-900 dark:text-white focus:outline-none focus:border-teal-600"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-3 gap-3">
                 <div>
-                  <label className="block text-slate-600 dark:text-slate-400 mb-1 font-semibold">UOM</label>
+                  <label className="block text-slate-600 dark:text-neutral-400 mb-1 font-semibold">UOM</label>
                   <input
                     type="text"
                     required
                     value={uom}
                     onChange={(e) => setUom(e.target.value)}
-                    className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg p-2 text-slate-900 dark:text-white focus:outline-none focus:border-teal-600"
+                    className="w-full bg-slate-50 dark:bg-[#121212] border border-slate-300 dark:border-neutral-700 rounded-lg p-2 text-slate-900 dark:text-white focus:outline-none focus:border-teal-600"
                   />
                 </div>
                 <div>
-                  <label className="block text-slate-600 dark:text-slate-400 mb-1 font-semibold">HSN Code</label>
+                  <label className="block text-slate-600 dark:text-neutral-400 mb-1 font-semibold">HSN Code</label>
                   <input
                     type="text"
                     required
                     value={hsnCode}
                     onChange={(e) => setHSNCode(e.target.value)}
-                    className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg p-2 text-slate-900 dark:text-white focus:outline-none focus:border-teal-600"
+                    className="w-full bg-slate-50 dark:bg-[#121212] border border-slate-300 dark:border-neutral-700 rounded-lg p-2 text-slate-900 dark:text-white focus:outline-none focus:border-teal-600"
                   />
                 </div>
                 <div>
-                  <label className="block text-slate-600 dark:text-slate-400 mb-1 font-semibold">GST %</label>
+                  <label className="block text-slate-600 dark:text-neutral-400 mb-1 font-semibold">GST %</label>
                   <input
                     type="number"
                     required
                     value={gstPercentage}
                     onChange={(e) => setGstPercentage(e.target.value)}
-                    className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg p-2 text-slate-900 dark:text-white focus:outline-none focus:border-teal-600"
+                    className="w-full bg-slate-50 dark:bg-[#121212] border border-slate-300 dark:border-neutral-700 rounded-lg p-2 text-slate-900 dark:text-white focus:outline-none focus:border-teal-600"
                   />
                 </div>
               </div>
@@ -353,7 +353,7 @@ export function AdminCatalogTab() {
                 <button
                   type="button"
                   onClick={() => setShowAddModal(false)}
-                  className="px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-400 cursor-pointer"
+                  className="px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-slate-600 dark:text-neutral-400 cursor-pointer"
                 >
                   Cancel
                 </button>

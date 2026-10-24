@@ -28,10 +28,10 @@ export function ProductOrderSheet({
   };
 
   return (
-    <div className="bg-white dark:bg-[#131926] border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-xs">
+    <div className="bg-white dark:bg-[#0A0A0A] border border-slate-200 dark:border-neutral-800 rounded-xl overflow-hidden shadow-xs">
       <div className="overflow-x-auto max-h-[750px] overflow-y-auto">
         <table className="w-full text-left text-xs font-mono min-w-[900px]">
-          <thead className="sticky top-0 z-10 bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 text-[10px] uppercase text-slate-500 dark:text-slate-400 tracking-wider font-bold">
+          <thead className="sticky top-0 z-10 bg-slate-50 dark:bg-[#121212] border-b border-slate-200 dark:border-neutral-800 text-[10px] uppercase text-slate-500 dark:text-neutral-400 tracking-wider font-bold">
             <tr>
               <th className="py-3 px-4">Medicine Brand &amp; Salt Composition</th>
               <th className="py-3 px-3">Pack &amp; Category</th>
@@ -45,7 +45,7 @@ export function ProductOrderSheet({
               <th className="py-3 px-4 text-center">Action</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100 dark:divide-slate-800/80">
+          <tbody className="divide-y divide-slate-100 dark:divide-neutral-800/80">
             {products.map((p) => {
               const isRestricted = ['SCHEDULE_H', 'SCHEDULE_H1', 'SCHEDULE_X'].includes(p.schedule);
               const lacksDl = isRestricted && (!currentOrg?.drug_license_no_20 || currentOrg.kyc_state !== 'APPROVED');
@@ -57,7 +57,7 @@ export function ProductOrderSheet({
               return (
                 <tr
                   key={p.id}
-                  className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors"
+                  className="hover:bg-slate-50/80 dark:hover:bg-neutral-800/40 transition-colors"
                 >
                   {/* Medicine Brand & Salt */}
                   <td className="py-3 px-4">
@@ -162,7 +162,7 @@ export function ProductOrderSheet({
 
                   {/* Quick Quantity Stepper */}
                   <td className="py-3 px-3 text-center whitespace-nowrap">
-                    <div className="inline-flex items-center bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg">
+                    <div className="inline-flex items-center bg-slate-100 dark:bg-[#121212] border border-slate-300 dark:border-neutral-700 rounded-lg">
                       <button
                         type="button"
                         onClick={() => setQty(p.id, -5)}
@@ -198,7 +198,7 @@ export function ProductOrderSheet({
                       <button
                         type="button"
                         onClick={() => onOpenDistributors(p)}
-                        className="inline-flex items-center gap-1 rounded-lg bg-teal-600 hover:bg-teal-700 text-white dark:bg-teal-500 dark:hover:bg-teal-600 dark:text-slate-950 px-3 py-1 text-[11px] font-bold transition-all cursor-pointer font-sans shadow-2xs"
+                        className="inline-flex items-center gap-1 rounded-lg bg-teal-600 hover:bg-teal-700 text-white dark:bg-teal-500 dark:hover:bg-teal-600 dark:text-black px-3 py-1 text-[11px] font-bold transition-all cursor-pointer font-sans shadow-2xs"
                       >
                         <span>Compare</span>
                         <ChevronRight className="w-3 h-3 stroke-[2.5]" />

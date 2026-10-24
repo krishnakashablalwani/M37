@@ -43,43 +43,43 @@
 }
 
 .dark {
-  --bg-app: #0B0F17;
-  --bg-surface: #131926;
-  --bg-subtle: #1A2234;
-  --bg-muted: #242E42;
+  --bg-app: #000000;
+  --bg-surface: #0A0A0A;
+  --bg-subtle: #121212;
+  --bg-muted: #1A1A1A;
   
-  --border-subtle: #1E283D;
-  --border-strong: #2D3B55;
+  --border-subtle: #222222;
+  --border-strong: #2E2E2E;
   --border-focus: #14B8A6;
 
-  --text-primary: #F8FAFC;
-  --text-secondary: #CBD5E1;
-  --text-muted: #94A3B8;
-  --text-subtle: #64748B;
+  --text-primary: #F5F5F5;
+  --text-secondary: #A3A3A3;
+  --text-muted: #737373;
+  --text-subtle: #525252;
 
   --brand-primary: #14B8A6;
   --brand-hover: #2DD4BF;
   --brand-light: rgba(20, 184, 166, 0.12);
   --brand-text: #2DD4BF;
 
-  --badge-emerald-bg: rgba(16, 185, 129, 0.15);
+  --badge-emerald-bg: rgba(16, 185, 129, 0.12);
   --badge-emerald-text: #34D399;
-  --badge-emerald-border: rgba(16, 185, 129, 0.3);
+  --badge-emerald-border: rgba(16, 185, 129, 0.25);
 
-  --badge-amber-bg: rgba(245, 158, 11, 0.15);
+  --badge-amber-bg: rgba(245, 158, 11, 0.12);
   --badge-amber-text: #FBBF24;
-  --badge-amber-border: rgba(245, 158, 11, 0.3);
+  --badge-amber-border: rgba(245, 158, 11, 0.25);
 
-  --badge-rose-bg: rgba(244, 63, 94, 0.15);
+  --badge-rose-bg: rgba(244, 63, 94, 0.12);
   --badge-rose-text: #FB7185;
-  --badge-rose-border: rgba(244, 63, 94, 0.3);
+  --badge-rose-border: rgba(244, 63, 94, 0.25);
 
-  --badge-blue-bg: rgba(59, 130, 246, 0.15);
-  --badge-blue-text: #60A5FA;
-  --badge-blue-border: rgba(59, 130, 246, 0.3);
+  --badge-blue-bg: rgba(255, 255, 255, 0.08);
+  --badge-blue-text: #E5E5E5;
+  --badge-blue-border: rgba(255, 255, 255, 0.15);
 
-  --shadow-card: inset 0 1px 0 0 rgba(255, 255, 255, 0.04), 0 2px 8px -2px rgba(0, 0, 0, 0.4);
-  --shadow-elevated: inset 0 1px 0 0 rgba(255, 255, 255, 0.08), 0 8px 16px -4px rgba(0, 0, 0, 0.6);
+  --shadow-card: inset 0 1px 0 0 rgba(255, 255, 255, 0.04), 0 2px 8px -2px rgba(0, 0, 0, 0.5);
+  --shadow-elevated: inset 0 1px 0 0 rgba(255, 255, 255, 0.08), 0 8px 16px -4px rgba(0, 0, 0, 0.8);
 }
 
 body {
@@ -118,11 +118,12 @@ body {
   border-radius: 3px;
 }
 .dark ::-webkit-scrollbar-thumb {
-  background: #2D3B55;
+  background: #262626;
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #94A3B8;
 }
 .dark ::-webkit-scrollbar-thumb:hover {
-  background: #475569;
+  background: #404040;
 }
+

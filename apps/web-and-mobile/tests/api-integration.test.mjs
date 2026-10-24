@@ -294,9 +294,11 @@ export async function runApiIntegrationTests() {
 }
 
 // Allow direct execution
-if (!process.env.RUN_AS_SUITE || process.argv[1]?.includes('api-integration')) {
+const isDirect = process.argv[1] && process.argv[1].replace(/\\/g, '/').endsWith('api-integration.test.mjs');
+if (isDirect) {
   runApiIntegrationTests().catch((e) => {
     console.error(e);
     process.exit(1);
   });
 }
+

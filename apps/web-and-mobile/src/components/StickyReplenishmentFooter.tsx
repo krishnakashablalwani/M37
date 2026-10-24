@@ -31,7 +31,7 @@ export function StickyReplenishmentFooter({
   return (
     <aside
       aria-label="Order summary"
-      className="fixed bottom-0 inset-x-0 z-40 bg-white/95 dark:bg-[#0B0F17]/95 backdrop-blur-xl border-t border-slate-200 dark:border-slate-800 py-3 px-4 sm:px-6 shadow-2xl transition-all animate-in slide-in-from-bottom duration-200"
+      className="fixed bottom-0 inset-x-0 z-40 bg-white/95 dark:bg-black/95 backdrop-blur-xl border-t border-slate-200 dark:border-neutral-800 py-3 px-4 sm:px-6 shadow-2xl transition-all animate-in slide-in-from-bottom duration-200"
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
         {/* Left: Cart Counter & Total */}
@@ -41,14 +41,14 @@ export function StickyReplenishmentFooter({
           </div>
 
           <div>
-            <div className="text-xs text-slate-700 dark:text-slate-300 font-mono flex items-center space-x-1.5">
+            <div className="text-xs text-slate-700 dark:text-neutral-300 font-mono flex items-center space-x-1.5">
               <strong className="text-slate-900 dark:text-white font-bold">{totalCount} Items Selected</strong>
               <span>|</span>
               <span className="text-teal-700 dark:text-teal-300 font-extrabold text-sm tabular-nums">
                 ₹{grandTotal.toFixed(2)}
               </span>
             </div>
-            <div className="text-[11px] text-slate-500 dark:text-slate-400 font-mono mt-0.5 flex items-center space-x-2">
+            <div className="text-[11px] text-slate-500 dark:text-neutral-400 font-mono mt-0.5 flex items-center space-x-2">
               <span>{distCount} {distCount === 1 ? 'Stockist' : 'Stockists'} Split</span>
               <span className="inline-flex items-center gap-1 rounded bg-emerald-50 dark:bg-emerald-950/40 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 font-mono">
                 <CheckCircle2 className="w-2.5 h-2.5" />
@@ -62,7 +62,7 @@ export function StickyReplenishmentFooter({
         <div className="flex items-center space-x-2 shrink-0">
           <button
             onClick={onOpenCart}
-            className="flex items-center space-x-1.5 px-4 py-2.5 rounded-lg bg-teal-700 hover:bg-teal-800 dark:bg-teal-500 dark:hover:bg-teal-400 text-white dark:text-slate-950 font-bold text-xs shadow-sm transition-all active:scale-95 cursor-pointer font-mono"
+            className="flex items-center space-x-1.5 px-4 py-2.5 rounded-lg bg-teal-700 hover:bg-teal-800 dark:bg-teal-500 dark:hover:bg-teal-400 text-white dark:text-black font-bold text-xs shadow-sm transition-all active:scale-95 cursor-pointer font-mono"
           >
             <span>Review Suggested Order</span>
             <ArrowRight className="w-4 h-4 ml-0.5" />

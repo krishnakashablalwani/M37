@@ -317,9 +317,11 @@ export async function runPharmaRegulatoryTests() {
 }
 
 // Allow direct execution
-if (!process.env.RUN_AS_SUITE || process.argv[1]?.includes('pharma-regulatory-rules')) {
+const isDirect = process.argv[1] && process.argv[1].replace(/\\/g, '/').endsWith('pharma-regulatory-rules.test.mjs');
+if (isDirect) {
   runPharmaRegulatoryTests().catch((e) => {
     console.error(e);
     process.exit(1);
   });
 }
+

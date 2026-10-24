@@ -169,7 +169,7 @@ export default function Home() {
   const handleClearCart = () => setCart([]);
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#0B0F17] text-slate-900 dark:text-slate-100 flex flex-col font-sans selection:bg-teal-500 selection:text-white pb-20 transition-colors">
+    <div className="min-h-screen bg-slate-50 dark:bg-black text-slate-900 dark:text-[#F5F5F5] flex flex-col font-sans selection:bg-teal-500 selection:text-white pb-20 transition-colors">
       {/* Persistent Glanceable Header */}
       <Header
         currentOrg={currentOrg}
@@ -209,10 +209,10 @@ export default function Home() {
                   <p className="text-xs text-slate-500 font-mono">Querying live Master SKUs...</p>
                 </div>
               ) : products.length === 0 ? (
-                <div className="text-center py-20 bg-white dark:bg-[#131926] rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs">
-                  <Pill className="w-10 h-10 text-slate-400 dark:text-slate-600 mx-auto mb-2" />
+                <div className="text-center py-20 bg-white dark:bg-[#0A0A0A] rounded-xl border border-slate-200 dark:border-neutral-800 shadow-xs">
+                  <Pill className="w-10 h-10 text-slate-400 dark:text-neutral-600 mx-auto mb-2" />
                   <h3 className="text-base font-bold text-slate-900 dark:text-white">No products found</h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-mono">
+                  <p className="text-xs text-slate-500 dark:text-neutral-400 mt-1 font-mono">
                     Try clearing active search query or schedule filter.
                   </p>
                 </div>
@@ -280,10 +280,10 @@ export default function Home() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-white dark:bg-[#101726] border-t border-slate-200 dark:border-slate-800 py-4 text-center text-xs text-slate-500 dark:text-slate-400 font-mono transition-colors">
+      <footer className="bg-white dark:bg-[#0A0A0A] border-t border-slate-200 dark:border-neutral-800 py-4 text-center text-xs text-slate-500 dark:text-neutral-400 font-mono transition-colors">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
           <div className="flex items-center space-x-2">
-            <span className="font-bold text-slate-900 dark:text-slate-200">PharmaSync B2B</span>
+            <span className="font-bold text-slate-900 dark:text-neutral-200">PharmaSync B2B</span>
             <span>•</span>
             <span>Telangana Pharmaceutical & Surgical Supply Chain</span>
           </div>

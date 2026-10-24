@@ -34,12 +34,12 @@ export function ProductSearchCard({
   const isGlovesOrSurgical = product.category === 'SURGICAL' || product.pack_size.toLowerCase().includes('box');
 
   return (
-    <div className="group relative flex flex-col justify-between rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#131926] p-4.5 transition-all duration-200 hover:shadow-md hover:border-teal-500/40 dark:hover:border-teal-500/40">
+    <div className="group relative flex flex-col justify-between rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-[#0A0A0A] p-4.5 transition-all duration-200 hover:shadow-md hover:border-teal-500/40 dark:hover:border-teal-500/40">
       <div>
         {/* Top Header Row: Pack Size, Category & Legal Pill */}
         <div className="flex items-center justify-between gap-2 mb-3">
           <div className="flex items-center space-x-1.5">
-            <span className="font-mono text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded border border-slate-200 dark:border-slate-700">
+            <span className="font-mono text-[11px] font-bold text-slate-700 dark:text-neutral-300 uppercase tracking-wide bg-slate-100 dark:bg-[#171717] px-2 py-0.5 rounded border border-slate-200 dark:border-neutral-700">
               {product.pack_size}
             </span>
             <span className="text-[10px] text-slate-500 font-mono hidden sm:inline">
@@ -69,7 +69,7 @@ export function ProductSearchCard({
           )}
 
           {product.schedule === 'NON_PHARMA' && (
-            <span className="inline-flex items-center gap-1 rounded bg-slate-100 dark:bg-slate-800 px-2 py-0.5 text-[10px] font-medium text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+            <span className="inline-flex items-center gap-1 rounded bg-slate-100 dark:bg-[#171717] px-2 py-0.5 text-[10px] font-medium text-slate-700 dark:text-neutral-300 border border-slate-200 dark:border-neutral-700">
               {product.category}
             </span>
           )}
@@ -94,12 +94,12 @@ export function ProductSearchCard({
             </h3>
 
             {product.generic_composition && (
-              <p className="mt-0.5 text-xs text-slate-600 dark:text-slate-300 font-mono truncate font-medium">
+              <p className="mt-0.5 text-xs text-slate-600 dark:text-neutral-300 font-mono truncate font-medium">
                 {product.generic_composition}
               </p>
             )}
 
-            <p className="mt-1 text-[11px] text-slate-500 dark:text-slate-400 font-sans truncate">
+            <p className="mt-1 text-[11px] text-slate-500 dark:text-neutral-400 font-sans truncate">
               {product.manufacturer}
             </p>
           </div>
@@ -107,8 +107,8 @@ export function ProductSearchCard({
       </div>
 
       {/* Commercial & Pricing Shelf */}
-      <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800">
-        <div className="bg-slate-50 dark:bg-slate-900/80 rounded-lg p-3 border border-slate-200 dark:border-slate-800 flex items-center justify-between gap-2">
+      <div className="mt-4 pt-3 border-t border-slate-100 dark:border-neutral-800">
+        <div className="bg-slate-50 dark:bg-[#121212] rounded-lg p-3 border border-slate-200 dark:border-neutral-800 flex items-center justify-between gap-2">
           <div>
             <div className="text-[9px] uppercase font-mono text-slate-500 font-semibold tracking-wider">
               Wholesale Landing PTR
@@ -144,10 +144,10 @@ export function ProductSearchCard({
 
         {/* Stockist Count & Quick Action Shelf */}
         <div className="mt-3.5 flex items-center justify-between gap-2">
-          <div className="flex items-center space-x-1.5 text-xs text-slate-500 dark:text-slate-400 font-mono">
+          <div className="flex items-center space-x-1.5 text-xs text-slate-500 dark:text-neutral-400 font-mono">
             <span className="w-2 h-2 rounded-full bg-emerald-500" />
             <span>
-              <strong className="text-slate-800 dark:text-slate-200">{stockistCount} Stockists</strong>
+              <strong className="text-slate-800 dark:text-neutral-200">{stockistCount} Stockists</strong>
             </span>
           </div>
 
@@ -164,7 +164,7 @@ export function ProductSearchCard({
             ) : (
               <>
                 {/* Direct Stepper */}
-                <div className="flex items-center bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs font-mono">
+                <div className="flex items-center bg-slate-100 dark:bg-[#121212] border border-slate-300 dark:border-neutral-700 rounded-lg text-xs font-mono">
                   <button
                     type="button"
                     onClick={() => setQuickQty((q) => Math.max(1, q - 5))}
@@ -185,7 +185,7 @@ export function ProductSearchCard({
                 <button
                   type="button"
                   onClick={() => onOpenDistributors(product)}
-                  className="inline-flex items-center gap-1 rounded-lg bg-teal-600 hover:bg-teal-700 text-white dark:bg-teal-500 dark:hover:bg-teal-600 dark:text-slate-950 px-3 py-1.5 text-xs font-bold transition-all cursor-pointer shadow-xs"
+                  className="inline-flex items-center gap-1 rounded-lg bg-teal-600 hover:bg-teal-700 text-white dark:bg-teal-500 dark:hover:bg-teal-600 dark:text-black px-3 py-1.5 text-xs font-bold transition-all cursor-pointer shadow-xs"
                 >
                   <span>Compare</span>
                   <ChevronRight className="w-3.5 h-3.5 stroke-[2.5]" />

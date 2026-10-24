@@ -42,8 +42,8 @@ export function SearchHero({
     {
       id: 'ALL',
       label: 'All Schedules',
-      activeStyle: 'bg-slate-800 text-white dark:bg-slate-100 dark:text-slate-900 font-bold',
-      inactiveStyle: 'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700',
+      activeStyle: 'bg-slate-800 text-white dark:bg-white dark:text-black font-bold',
+      inactiveStyle: 'bg-slate-100 text-slate-600 border-slate-200 dark:bg-[#171717] dark:text-neutral-400 dark:border-neutral-700',
     },
     {
       id: 'OTC',
@@ -81,7 +81,7 @@ export function SearchHero({
   }, []);
 
   return (
-    <div className="bg-white dark:bg-[#101726] py-4 px-4 sm:px-6 lg:px-8 border-b border-slate-200 dark:border-slate-800 transition-colors">
+    <div className="bg-white dark:bg-[#0A0A0A] py-4 px-4 sm:px-6 lg:px-8 border-b border-slate-200 dark:border-neutral-800 transition-colors">
       <div className="max-w-7xl mx-auto space-y-3.5">
         {/* Top Header Row with Search & View Mode Switcher */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -89,21 +89,21 @@ export function SearchHero({
             <h1 className="text-base sm:text-lg font-extrabold text-slate-900 dark:text-white tracking-tight">
               Wholesale Medicine &amp; Surgical Exchange
             </h1>
-            <span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-mono font-bold">
+            <span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 dark:bg-[#1A1A1A] text-slate-600 dark:text-neutral-400 font-mono font-bold">
               {totalProducts} Master SKUs
             </span>
           </div>
 
           {/* View Mode Toggle */}
           <div className="flex items-center space-x-2 self-start sm:self-auto">
-            <div className="flex items-center bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-0.5 rounded-lg text-xs font-mono">
+            <div className="flex items-center bg-slate-100 dark:bg-[#121212] border border-slate-200 dark:border-neutral-800 p-0.5 rounded-lg text-xs font-mono">
               <button
                 type="button"
                 onClick={() => setViewMode('grid')}
                 className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-md font-medium transition-all cursor-pointer ${
                   viewMode === 'grid'
-                    ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-bold shadow-xs border border-slate-200 dark:border-slate-700'
-                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                    ? 'bg-white dark:bg-[#1A1A1A] text-slate-900 dark:text-white font-bold shadow-xs border border-slate-200 dark:border-neutral-700'
+                    : 'text-slate-500 dark:text-neutral-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
                 title="Product Cards Grid View"
               >
@@ -115,8 +115,8 @@ export function SearchHero({
                 onClick={() => setViewMode('table')}
                 className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-md font-medium transition-all cursor-pointer ${
                   viewMode === 'table'
-                    ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-bold shadow-xs border border-slate-200 dark:border-slate-700'
-                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                    ? 'bg-white dark:bg-[#1A1A1A] text-slate-900 dark:text-white font-bold shadow-xs border border-slate-200 dark:border-neutral-700'
+                    : 'text-slate-500 dark:text-neutral-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
                 title="Dense Wholesale Order Sheet"
               >
@@ -128,7 +128,7 @@ export function SearchHero({
         </div>
 
         {/* High-Velocity Command Search Bar */}
-        <div className="relative flex items-center rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-900/80 focus-within:bg-white dark:focus-within:bg-slate-900 focus-within:border-teal-600 dark:focus-within:border-teal-400 focus-within:ring-2 focus-within:ring-teal-500/20 transition-all shadow-2xs">
+        <div className="relative flex items-center rounded-xl border border-slate-300 dark:border-neutral-700 bg-slate-50/70 dark:bg-[#121212] focus-within:bg-white dark:focus-within:bg-[#141414] focus-within:border-teal-600 dark:focus-within:border-teal-400 focus-within:ring-2 focus-within:ring-teal-500/20 transition-all shadow-2xs">
           <div className="pl-3.5 pr-2 text-slate-400">
             <Search className="w-4 h-4 text-teal-600 dark:text-teal-400" />
           </div>
@@ -138,7 +138,7 @@ export function SearchHero({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search by brand name (e.g. Dolo, Augmentin), generic salt (e.g. Paracetamol), manufacturer, or barcode..."
-            className="w-full py-2.5 pr-3 bg-transparent text-xs sm:text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none font-sans"
+            className="w-full py-2.5 pr-3 bg-transparent text-xs sm:text-sm text-slate-900 dark:text-neutral-100 placeholder-slate-400 dark:placeholder-neutral-500 focus:outline-none font-sans"
           />
           <div className="flex items-center space-x-1.5 pr-2.5">
             {searchQuery ? (
@@ -151,7 +151,7 @@ export function SearchHero({
               </button>
             ) : (
               <div className="hidden sm:flex items-center space-x-1">
-                <kbd className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-slate-700">
+                <kbd className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-slate-200 dark:bg-[#1A1A1A] text-slate-600 dark:text-neutral-400 border border-slate-300 dark:border-neutral-700">
                   ⌘K
                 </kbd>
               </div>
@@ -161,7 +161,7 @@ export function SearchHero({
             <button
               type="button"
               onClick={() => setScannerOpen(true)}
-              className="p-1.5 rounded-lg text-slate-500 dark:text-slate-400 hover:text-teal-600 dark:hover:text-teal-400 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors cursor-pointer border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900"
+              className="p-1.5 rounded-lg text-slate-500 dark:text-neutral-400 hover:text-teal-600 dark:hover:text-teal-400 hover:bg-slate-200 dark:hover:bg-neutral-800 transition-colors cursor-pointer border border-slate-200 dark:border-neutral-700 bg-white dark:bg-[#121212]"
               title="Scan Barcode (EAN-13 / GS1)"
             >
               <ScanLine className="w-4 h-4" />
@@ -172,15 +172,15 @@ export function SearchHero({
         {/* Filters Bar: Categories & Schedules */}
         <div className="flex flex-wrap items-center justify-between gap-2.5 pt-0.5">
           {/* Categories */}
-          <div className="flex items-center space-x-1 bg-slate-100 dark:bg-slate-900 p-1 rounded-xl border border-slate-200 dark:border-slate-800 overflow-x-auto text-xs font-sans">
+          <div className="flex items-center space-x-1 bg-slate-100 dark:bg-[#121212] p-1 rounded-xl border border-slate-200 dark:border-neutral-800 overflow-x-auto text-xs font-sans">
             {categories.map((c) => (
               <button
                 key={c.id}
                 onClick={() => setSelectedCategory(c.id)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
                   selectedCategory === c.id
-                    ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-bold shadow-xs border border-slate-200 dark:border-slate-700'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/50 dark:hover:bg-slate-800/50'
+                    ? 'bg-white dark:bg-[#1A1A1A] text-slate-900 dark:text-white font-bold shadow-xs border border-slate-200 dark:border-neutral-700'
+                    : 'text-slate-600 dark:text-neutral-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/50 dark:hover:bg-neutral-800/50'
                 }`}
               >
                 {c.label}
@@ -190,7 +190,7 @@ export function SearchHero({
 
           {/* Schedules */}
           <div className="flex items-center space-x-1.5 flex-wrap gap-1">
-            <span className="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-mono font-semibold mr-1 flex items-center">
+            <span className="text-[10px] text-slate-500 dark:text-neutral-400 uppercase font-mono font-semibold mr-1 flex items-center">
               <Filter className="w-3 h-3 mr-1 text-slate-400" /> Schedule:
             </span>
             {schedules.map((s) => {

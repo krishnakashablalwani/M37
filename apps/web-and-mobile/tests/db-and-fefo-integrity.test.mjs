@@ -209,9 +209,11 @@ export async function runDatabaseAndFefoTests() {
 }
 
 // Allow direct execution
-if (!process.env.RUN_AS_SUITE || process.argv[1]?.includes('db-and-fefo-integrity')) {
+const isDirect = process.argv[1] && process.argv[1].replace(/\\/g, '/').endsWith('db-and-fefo-integrity.test.mjs');
+if (isDirect) {
   runDatabaseAndFefoTests().catch((e) => {
     console.error(e);
     process.exit(1);
   });
 }
+

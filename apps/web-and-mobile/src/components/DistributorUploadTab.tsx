@@ -97,21 +97,21 @@ UNKNOWN-SKU-999,ERR-BATCH,2027-01-01,100.0,75.0,0.0,,0,0,1,50`);
       <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left: Input & Upload Controls */}
         <div className="lg:col-span-2 space-y-4">
-          <div className="bg-white dark:bg-[#131926] border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-xs">
+          <div className="bg-white dark:bg-[#0A0A0A] border border-slate-200 dark:border-neutral-800 rounded-xl p-5 shadow-xs">
             {/* Distributor Selector */}
             <div className="mb-4">
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+              <label className="block text-xs font-bold text-slate-700 dark:text-neutral-300 mb-1">
                 Fulfilling Distributor Organization
               </label>
               <select
                 value={selectedDistributorId}
                 onChange={(e) => setSelectedDistributorId(e.target.value)}
-                className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg p-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-teal-600"
+                className="w-full bg-slate-50 dark:bg-[#121212] border border-slate-300 dark:border-neutral-700 rounded-lg p-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-teal-600"
               >
                 {distributors
                   .filter((d) => d.org_type === 'DISTRIBUTOR')
                   .map((d) => (
-                    <option key={d.id} value={d.id} className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">
+                    <option key={d.id} value={d.id} className="bg-white dark:bg-[#121212] text-slate-900 dark:text-white">
                       {d.trade_name} ({d.city} - Lic: {d.drug_license_no_20 || 'Approved'})
                     </option>
                   ))}
@@ -176,14 +176,14 @@ UNKNOWN-SKU-999,ERR-BATCH,2027-01-01,100.0,75.0,0.0,,0,0,1,50`)
 
         {/* Right: Validation & Staging Report */}
         <div className="space-y-4">
-          <div className="bg-white dark:bg-[#131926] border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-xs">
+          <div className="bg-white dark:bg-[#0A0A0A] border border-slate-200 dark:border-neutral-800 rounded-xl p-5 shadow-xs">
             <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-2">Ingestion Staging Summary</h3>
 
             {result ? (
               <div className="space-y-4 text-xs font-mono">
                 {/* Stats Grid */}
                 <div className="grid grid-cols-3 gap-2 text-center">
-                  <div className="bg-slate-50 dark:bg-slate-900 p-2.5 rounded-lg border border-slate-200 dark:border-slate-800">
+                  <div className="bg-slate-50 dark:bg-[#121212] p-2.5 rounded-lg border border-slate-200 dark:border-neutral-800">
                     <span className="text-[10px] text-slate-500 block uppercase font-sans font-bold">Total Rows</span>
                     <strong className="text-slate-900 dark:text-white text-base">{result.processed || 0}</strong>
                   </div>

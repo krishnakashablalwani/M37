@@ -203,14 +203,14 @@ export function DistributorOrderWorkstation({
         );
       case 'ACCEPTED':
         return (
-          <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950/50 dark:text-blue-300 dark:border-blue-800">
+          <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-100 text-slate-700 border border-slate-300 dark:bg-neutral-800 dark:text-neutral-200 dark:border-neutral-700">
             Accepted
           </span>
         );
       case 'PROCESSING':
       case 'PACKED':
         return (
-          <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 dark:bg-indigo-950/50 dark:text-indigo-300 dark:border-indigo-800">
+          <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-teal-50 text-teal-800 border border-teal-200 dark:bg-teal-950/50 dark:text-teal-300 dark:border-teal-800">
             {status}
           </span>
         );
@@ -320,10 +320,10 @@ export function DistributorOrderWorkstation({
       {activeView === 'orders' && (
         <div className="mt-6 grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-[600px]">
           {/* Left Pane (40% on Desktop): Order Stream sorted by Urgency */}
-          <div className="lg:col-span-5 bg-white dark:bg-[#131926] border border-slate-200 dark:border-slate-800 rounded-xl flex flex-col overflow-hidden shadow-xs">
+          <div className="lg:col-span-5 bg-white dark:bg-[#0A0A0A] border border-slate-200 dark:border-neutral-800 rounded-xl flex flex-col overflow-hidden shadow-xs">
             {/* Status Filter Header */}
-            <div className="p-3 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 flex items-center justify-between text-xs font-mono">
-              <span className="text-slate-500 dark:text-slate-400 text-[11px] uppercase tracking-wider font-semibold">
+            <div className="p-3 border-b border-slate-200 dark:border-neutral-800 bg-slate-50 dark:bg-[#121212] flex items-center justify-between text-xs font-mono">
+              <span className="text-slate-500 dark:text-neutral-400 text-[11px] uppercase tracking-wider font-semibold">
                 Incoming Stream ({orders.length})
               </span>
               <div className="flex items-center space-x-1">
@@ -412,11 +412,11 @@ export function DistributorOrderWorkstation({
           </div>
 
           {/* Right Pane (60% on Desktop): Batch Assignment & Invoice Generator */}
-          <div className="lg:col-span-7 bg-white dark:bg-[#131926] border border-slate-200 dark:border-slate-800 rounded-xl flex flex-col overflow-hidden shadow-xs">
+          <div className="lg:col-span-7 bg-white dark:bg-[#0A0A0A] border border-slate-200 dark:border-neutral-800 rounded-xl flex flex-col overflow-hidden shadow-xs">
             {selectedOrder ? (
               <div className="flex-1 flex flex-col p-5 overflow-y-auto">
                 {/* Order Header */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-200 dark:border-slate-800">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-200 dark:border-neutral-800">
                   <div>
                     <div className="flex items-center space-x-2">
                       <span className="font-mono text-base font-black text-slate-900 dark:text-white">
@@ -424,7 +424,7 @@ export function DistributorOrderWorkstation({
                       </span>
                       {getStatusBadge(selectedOrder.status)}
                     </div>
-                    <div className="text-xs text-slate-700 dark:text-slate-300 mt-1 font-mono">
+                    <div className="text-xs text-slate-700 dark:text-neutral-300 mt-1 font-mono">
                       Retailer: <strong className="text-slate-900 dark:text-white font-sans">{selectedOrder.retailer_name}</strong> • Phone:{' '}
                       {selectedOrder.retailer_phone}
                     </div>
@@ -459,7 +459,7 @@ export function DistributorOrderWorkstation({
                       <button
                         onClick={() => handleUpdateStatus(selectedOrder.id, 'PROCESSING')}
                         disabled={actionLoadingId === selectedOrder.id}
-                        className="flex items-center space-x-1.5 px-4 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all shadow-xs active:scale-95 cursor-pointer font-mono"
+                        className="flex items-center space-x-1.5 px-4 py-1.5 rounded-lg bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold transition-all shadow-xs active:scale-95 cursor-pointer font-mono"
                       >
                         <Package className="w-3.5 h-3.5" />
                         <span>Move to Packing</span>
@@ -593,9 +593,9 @@ export function DistributorOrderWorkstation({
 
       {/* VIEW 2: DENSE ZERO-WASTED-SPACE BATCH INVENTORY GRID */}
       {activeView === 'inventory_grid' && (
-        <div className="mt-6 bg-white dark:bg-[#131926] border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-xs">
+        <div className="mt-6 bg-white dark:bg-[#0A0A0A] border border-slate-200 dark:border-neutral-800 rounded-xl overflow-hidden shadow-xs">
           {/* Quick Filter Pills & Search */}
-          <div className="p-3.5 bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
+          <div className="p-3.5 bg-slate-50 dark:bg-[#121212] border-b border-slate-200 dark:border-neutral-800 flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
             <div className="flex items-center space-x-1.5 flex-wrap gap-1">
               <span className="text-slate-500 mr-1 flex items-center">
                 <Filter className="w-3.5 h-3.5 mr-1 text-teal-600 dark:text-teal-400" /> Batches:

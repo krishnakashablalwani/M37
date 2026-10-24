@@ -224,14 +224,14 @@ export function AutoReplenishDeck({ currentOrg, onPunchOrder }: AutoReplenishDec
         className={`rounded-xl border p-4 sm:p-5 transition-all shadow-xs ${
           isFlashing
             ? 'ring-2 ring-teal-500 border-teal-500 bg-teal-50/20'
-            : 'bg-white dark:bg-[#131926] border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
+            : 'bg-white dark:bg-[#0A0A0A] border-slate-200 dark:border-neutral-800 hover:border-slate-300 dark:hover:border-neutral-700'
         }`}
       >
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           {/* Product & Micro-indicators */}
           <div className="flex-1">
             <div className="flex items-center space-x-2 flex-wrap gap-y-1">
-              <span className="font-mono text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded border border-slate-200 dark:border-slate-700">
+              <span className="font-mono text-[11px] font-bold text-slate-700 dark:text-neutral-300 uppercase bg-slate-100 dark:bg-[#171717] px-2 py-0.5 rounded border border-slate-200 dark:border-neutral-700">
                 {item.pack_size}
               </span>
               <span
@@ -409,7 +409,7 @@ export function AutoReplenishDeck({ currentOrg, onPunchOrder }: AutoReplenishDec
 
       {/* 4 Executive Metric Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-5">
-        <div className="bg-white dark:bg-[#131926] border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-xs">
+        <div className="bg-white dark:bg-[#0A0A0A] border border-slate-200 dark:border-neutral-800 rounded-xl p-4 shadow-xs">
           <div className="text-[10px] uppercase font-mono text-slate-500 font-semibold tracking-wider">
             Stockout Deficit
           </div>
@@ -421,7 +421,7 @@ export function AutoReplenishDeck({ currentOrg, onPunchOrder }: AutoReplenishDec
           </div>
         </div>
 
-        <div className="bg-white dark:bg-[#131926] border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-xs">
+        <div className="bg-white dark:bg-[#0A0A0A] border border-slate-200 dark:border-neutral-800 rounded-xl p-4 shadow-xs">
           <div className="text-[10px] uppercase font-mono text-slate-500 font-semibold tracking-wider">
             Capital Required
           </div>
@@ -433,7 +433,7 @@ export function AutoReplenishDeck({ currentOrg, onPunchOrder }: AutoReplenishDec
           </div>
         </div>
 
-        <div className="bg-white dark:bg-[#131926] border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-xs">
+        <div className="bg-white dark:bg-[#0A0A0A] border border-slate-200 dark:border-neutral-800 rounded-xl p-4 shadow-xs">
           <div className="text-[10px] uppercase font-mono text-slate-500 font-semibold tracking-wider">
             Projected Margin
           </div>
@@ -445,7 +445,7 @@ export function AutoReplenishDeck({ currentOrg, onPunchOrder }: AutoReplenishDec
           </div>
         </div>
 
-        <div className="bg-white dark:bg-[#131926] border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-xs">
+        <div className="bg-white dark:bg-[#0A0A0A] border border-slate-200 dark:border-neutral-800 rounded-xl p-4 shadow-xs">
           <div className="text-[10px] uppercase font-mono text-slate-500 font-semibold tracking-wider">
             Fulfillment SLA
           </div>
@@ -498,8 +498,8 @@ export function AutoReplenishDeck({ currentOrg, onPunchOrder }: AutoReplenishDec
             );
 
             return (
-              <div key={distName} className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#131926] p-4.5 shadow-xs">
-                <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3 mb-4">
+              <div key={distName} className="rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-[#0A0A0A] p-4.5 shadow-xs">
+                <div className="flex items-center justify-between border-b border-slate-100 dark:border-neutral-800 pb-3 mb-4">
                   <div className="flex items-center space-x-2">
                     <Building2 className="w-4 h-4 text-teal-600 dark:text-teal-400" />
                     <h3 className="text-sm font-bold text-slate-900 dark:text-white">{distName}</h3>
@@ -520,7 +520,7 @@ export function AutoReplenishDeck({ currentOrg, onPunchOrder }: AutoReplenishDec
       </div>
 
       {/* Confirmation & Order Punch Action Deck */}
-      <div className="mt-8 p-4 sm:p-5 rounded-xl bg-white dark:bg-[#131926] border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xs">
+      <div className="mt-8 p-4 sm:p-5 rounded-xl bg-white dark:bg-[#0A0A0A] border border-slate-200 dark:border-neutral-800 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xs">
         <div>
           <div className="flex items-center space-x-2">
             <ShieldCheck className="w-4 h-4 text-teal-600 dark:text-teal-400" />

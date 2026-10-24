@@ -238,16 +238,16 @@ export function LedgerAndRMATab({
               return (
                 <div
                   key={link.id}
-                  className="bg-white dark:bg-[#131926] border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-xs relative overflow-hidden"
+                  className="bg-white dark:bg-[#0A0A0A] border border-slate-200 dark:border-neutral-800 rounded-xl p-5 shadow-xs relative overflow-hidden"
                 >
-                  <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+                  <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-neutral-800">
                     <div className="flex items-center space-x-2">
                       <Building2 className="h-4 w-4 text-teal-600 dark:text-teal-400" />
                       <span className="font-bold text-xs text-slate-900 dark:text-white">
                         {isRetailer ? link.distributor_name : link.retailer_name}
                       </span>
                     </div>
-                    <span className="text-[10px] bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-800 px-2 py-0.5 rounded font-mono font-bold">
+                    <span className="text-[10px] bg-teal-50 text-teal-700 border border-teal-200 dark:bg-teal-950/40 dark:text-teal-300 dark:border-teal-800 px-2 py-0.5 rounded font-mono font-bold">
                       {link.credit_days} Days Credit
                     </span>
                   </div>
@@ -288,15 +288,15 @@ export function LedgerAndRMATab({
           </div>
 
           {/* Invoices List */}
-          <div className="bg-white dark:bg-[#131926] border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-xs">
-            <div className="p-4 bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs">
+          <div className="bg-white dark:bg-[#0A0A0A] border border-slate-200 dark:border-neutral-800 rounded-xl overflow-hidden shadow-xs">
+            <div className="p-4 bg-slate-50 dark:bg-[#121212] border-b border-slate-200 dark:border-neutral-800 flex items-center justify-between text-xs">
               <span className="font-bold text-slate-900 dark:text-white text-sm">Issued Tax Invoices &amp; Aging</span>
               <span className="text-slate-500">{invoices.length} total invoice{invoices.length === 1 ? '' : 's'}</span>
             </div>
 
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs font-mono">
-                <thead className="text-[10px] uppercase text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-800 font-bold">
+                <thead className="text-[10px] uppercase text-slate-500 dark:text-neutral-400 bg-slate-50 dark:bg-[#121212] border-b border-slate-200 dark:border-neutral-800 font-bold">
                   <tr>
                     <th className="py-3 px-4">Invoice No / Order Ref</th>
                     <th className="py-3 px-4">Parties</th>
@@ -383,10 +383,10 @@ export function LedgerAndRMATab({
       {/* Returns & RMA Tab */}
       {activeSubTab === 'rma' && (
         <div className="mt-6 space-y-6">
-          <div className="flex justify-between items-center bg-white dark:bg-[#131926] border border-slate-200 dark:border-slate-800 p-4 rounded-xl">
+          <div className="flex justify-between items-center bg-white dark:bg-[#0A0A0A] border border-slate-200 dark:border-neutral-800 p-4 rounded-xl">
             <div>
               <h3 className="text-base font-bold text-slate-900 dark:text-white">Return Merchandise Authorizations (RMA)</h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              <p className="text-xs text-slate-500 dark:text-neutral-400 mt-0.5">
                 Damaged, short-supplied, or near-expiry batches are quarantined and reconciled via GST Credit Notes.
               </p>
             </div>
@@ -403,10 +403,10 @@ export function LedgerAndRMATab({
           </div>
 
           {/* RMA Claims Table */}
-          <div className="bg-white dark:bg-[#131926] border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-xs">
+          <div className="bg-white dark:bg-[#0A0A0A] border border-slate-200 dark:border-neutral-800 rounded-xl overflow-hidden shadow-xs">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs font-mono">
-                <thead className="text-[10px] uppercase text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 font-bold">
+                <thead className="text-[10px] uppercase text-slate-500 dark:text-neutral-400 bg-slate-50 dark:bg-[#121212] border-b border-slate-200 dark:border-neutral-800 font-bold">
                   <tr>
                     <th className="py-3 px-4">RMA Number</th>
                     <th className="py-3 px-4">Product &amp; Batch</th>
@@ -498,21 +498,21 @@ export function LedgerAndRMATab({
 
       {/* Pay Modal */}
       {payModalInv && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
-          <div className="bg-white dark:bg-[#131926] border border-slate-200 dark:border-slate-800 rounded-2xl max-w-md w-full p-6 text-slate-900 dark:text-white shadow-xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 dark:bg-black/80 backdrop-blur-xs">
+          <div className="bg-white dark:bg-[#0A0A0A] border border-slate-200 dark:border-neutral-800 rounded-2xl max-w-md w-full p-6 text-slate-900 dark:text-white shadow-xl">
             <h3 className="text-base font-bold text-slate-900 dark:text-white">Record Invoice Settlement</h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            <p className="text-xs text-slate-500 dark:text-neutral-400 mt-0.5">
               Invoice <strong className="text-teal-700 dark:text-teal-400">{payModalInv.invoice_number}</strong> payable to{' '}
               {payModalInv.distributor_name}
             </p>
 
             <form onSubmit={handlePay} className="mt-4 space-y-3 text-xs">
               <div>
-                <label className="block text-slate-600 dark:text-slate-400 mb-1 font-semibold">Payment Method</label>
+                <label className="block text-slate-600 dark:text-neutral-400 mb-1 font-semibold">Payment Method</label>
                 <select
                   value={payMethod}
                   onChange={(e: any) => setPayMethod(e.target.value)}
-                  className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg p-2 text-slate-900 dark:text-white"
+                  className="w-full bg-slate-50 dark:bg-[#121212] border border-slate-300 dark:border-neutral-700 rounded-lg p-2 text-slate-900 dark:text-white"
                 >
                   <option value="UPI">Direct UPI Deep Link</option>
                   <option value="BANK_TRANSFER">NEFT / RTGS Bank Transfer</option>
@@ -522,14 +522,14 @@ export function LedgerAndRMATab({
               </div>
 
               <div>
-                <label className="block text-slate-600 dark:text-slate-400 mb-1 font-semibold">Amount to Settle (₹)</label>
+                <label className="block text-slate-600 dark:text-neutral-400 mb-1 font-semibold">Amount to Settle (₹)</label>
                 <input
                   type="number"
                   step="0.01"
                   required
                   value={payAmount}
                   onChange={(e) => setPayAmount(e.target.value)}
-                  className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg p-2 font-mono text-slate-900 dark:text-white text-sm"
+                  className="w-full bg-slate-50 dark:bg-[#121212] border border-slate-300 dark:border-neutral-700 rounded-lg p-2 font-mono text-slate-900 dark:text-white text-sm"
                 />
               </div>
 
@@ -537,7 +537,7 @@ export function LedgerAndRMATab({
                 <button
                   type="button"
                   onClick={() => setPayModalInv(null)}
-                  className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-400 cursor-pointer"
+                  className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-slate-600 dark:text-neutral-400 cursor-pointer"
                 >
                   Cancel
                 </button>
@@ -556,10 +556,10 @@ export function LedgerAndRMATab({
 
       {/* Raise RMA Modal */}
       {showRmaModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
-          <div className="bg-white dark:bg-[#131926] border border-slate-200 dark:border-slate-800 rounded-2xl max-w-lg w-full p-6 text-slate-900 dark:text-white shadow-xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 dark:bg-black/80 backdrop-blur-xs">
+          <div className="bg-white dark:bg-[#0A0A0A] border border-slate-200 dark:border-neutral-800 rounded-2xl max-w-lg w-full p-6 text-slate-900 dark:text-white shadow-xl">
             <h3 className="text-base font-bold text-slate-900 dark:text-white">Raise Return Request (RMA)</h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            <p className="text-xs text-slate-500 dark:text-neutral-400 mt-0.5">
               Select delivered order and batch for return inspection.
             </p>
 
