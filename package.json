@@ -2,6 +2,7 @@
   "name": "m37-b2b-root",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "description": "B2B Pharmaceutical, Surgical, and FMCG Ordering & Distribution Management Platform",
   "workspaces": [
     "apps/*",
